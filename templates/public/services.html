@@ -71,7 +71,20 @@
         {% for category in categories %}
         <div class="col-md-6 col-lg-3 mb-3">
             <div class="card h-100 text-center p-3">
-                <i class="fas fa-{% if 'food' in category.name.lower %}utensils{% elif 'medicine' in category.name.lower %}pills{% elif 'shelter' in category.name.lower %}home{% elif 'clothing' in category.name.lower %}tshirt{% else %}box{% endif %} fa-2x text-primary mb-2"></i>
+                <i class="fas fa-{% if 'baby' in category.name.lower %}baby
+                    {% elif 'bedding' in category.name.lower %}bed-pulse    
+                    {% elif 'comfort' in category.name.lower %}football
+                    {% elif 'cleaning' in category.name.lower %}broom
+                    {% elif 'clothing' in category.name.lower %}tshirt
+                    {% elif 'food' in category.name.lower %}utensils
+                    {% elif 'health' in category.name.lower %}suitcase-medical
+                    {% elif 'hygiene' in category.name.lower %}pump-soap
+                    {% elif 'pet' in category.name.lower %}paw
+                    {% elif 'power' in category.name.lower %}plug-circle-bolt
+                    {% elif 'volunteer' in category.name.lower %}handshake-angle
+                    {% else %}box
+                    {% endif %} fa-2x text-primary mb-2">
+                </i>
                 <h6 class="fw-bold">{{ category.name }}</h6>
             </div>
         </div>
