@@ -1,0 +1,431 @@
+{% extends 'base.html' %}
+
+{% block extra_css %}
+<style>
+    .hero-section {
+        position: relative;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.8) 0%, rgba(118, 75, 162, 0.8) 100%),
+                    url('https://images.unsplash.com/photo-1559027615-cd4628902d4a?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80') center/cover no-repeat;
+        background-blend-mode: overlay;
+        background-attachment: fixed;
+        color: white;
+        padding: 0.5rem 2rem;
+        border-radius: 0;
+        margin-bottom: 0;
+        min-height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.15), inset 0 0 80px rgba(0, 0, 0, 0.1);
+    }
+    
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.35) 100%);
+        pointer-events: none;
+        z-index: 1;
+    }
+    
+    .hero-section::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.06) 50%, transparent 70%);
+        animation: shine 10s infinite;
+        pointer-events: none;
+        z-index: 1;
+    }
+    
+    @keyframes shine {
+        0% {
+            transform: translateX(-100%) translateY(-100%) rotate(45deg);
+        }
+        100% {
+            transform: translateX(100%) translateY(100%) rotate(45deg);
+        }
+    }
+    
+    .hero-content {
+        position: relative;
+        z-index: 2;
+        max-width: 900px;
+        margin: 0 auto;
+    }
+    
+    .hero-section h1 {
+        font-size: 2.2rem;
+        font-weight: 800;
+        text-shadow: 3px 3px 12px rgba(0, 0, 0, 0.7), 0 0 25px rgba(255, 255, 255, 0.15);
+        margin-bottom: 0.4rem;
+        letter-spacing: -0.2px;
+        line-height: 1.2;
+    }
+    
+    .hero-section .lead {
+        font-size: 0.85rem;
+        font-weight: 400;
+        text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.6);
+        margin-bottom: 0.3rem;
+        letter-spacing: 0.2px;
+        opacity: 0.95;
+    }
+    
+    .hero-icon {
+        font-size: 2.5rem;
+        margin-bottom: 0.4rem;
+        text-shadow: 3px 3px 12px rgba(0, 0, 0, 0.7);
+        filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.4));
+    }
+    
+    .stat-card {
+        backdrop-filter: blur(10px);
+        background: rgba(255, 255, 255, 0.15) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-8px) scale(1.05);
+        background: rgba(255, 255, 255, 0.25) !important;
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+    }
+    
+    .stat-card.success {
+        background: rgba(17, 153, 142, 0.2) !important;
+        border-color: rgba(56, 239, 125, 0.3);
+    }
+    
+    .stat-card.warning {
+        background: rgba(240, 147, 251, 0.2) !important;
+        border-color: rgba(245, 87, 108, 0.3);
+    }
+    
+    .stat-card.info {
+        background: rgba(79, 172, 254, 0.2) !important;
+        border-color: rgba(0, 242, 254, 0.3);
+    }
+    
+    @media (max-width: 768px) {
+        .hero-section {
+            min-height: 45px;
+            padding: 0.5rem 1rem;
+            background-attachment: scroll;
+        }
+        
+        .hero-section h1 {
+            font-size: 1.6rem;
+        }
+        
+        .hero-section .lead {
+            font-size: 0.75rem;
+        }
+        
+        .hero-icon {
+            font-size: 1.8rem;
+            margin-bottom: 0.2rem;
+        }
+    }
+    
+    /* Enhanced Card Design */
+    .card {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow: hidden;
+    }
+    
+    .card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+    }
+    
+    .card-body {
+        padding: 1.5rem;
+    }
+    
+    /* Enhanced Filter Section */
+    .container .card.p-4 {
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .form-select, .form-control {
+        border-radius: 10px;
+        border: 1.5px solid #e2e8f0;
+        transition: all 0.3s ease;
+    }
+    
+    .form-select:focus, .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+    
+    /* Enhanced Page Header */
+    .page-header {
+        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        padding: 2rem;
+        border-radius: 16px;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+        border-left: 4px solid #667eea;
+    }
+    
+    /* Badge Enhancements */
+    .badge {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+    }
+    
+    /* Enhanced Stat Cards */
+    .stat-card {
+        backdrop-filter: blur(15px);
+        background: rgba(255, 255, 255, 0.2) !important;
+        border: 1.5px solid rgba(255, 255, 255, 0.3);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        border-radius: 16px;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-10px) scale(1.08);
+        background: rgba(255, 255, 255, 0.3) !important;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+    }
+    
+    .stat-card.success {
+        background: rgba(17, 153, 142, 0.25) !important;
+        border-color: rgba(56, 239, 125, 0.4);
+    }
+    
+    .stat-card.warning {
+        background: rgba(240, 147, 251, 0.25) !important;
+        border-color: rgba(245, 87, 108, 0.4);
+    }
+    
+    .stat-card.info {
+        background: rgba(79, 172, 254, 0.25) !important;
+        border-color: rgba(0, 242, 254, 0.4);
+    }
+    
+    /* Smooth Animations */
+    * {
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    
+    /* Enhanced Grid Layout */
+    .row.g-4 > * {
+        padding: 0.75rem;
+    }
+    
+    /* Button Enhancements */
+    .btn-sm {
+        border-radius: 8px;
+        font-weight: 500;
+        padding: 0.4rem 1rem;
+    }
+    
+    .btn-outline-primary {
+        border-width: 2px;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-outline-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section">
+    <div class="container text-center">
+        <h1 class="display-8 fw-bold mb-8">
+            <i class="fas fa-hands-helping me-3"></i>Hurricane Heroes
+        </h1>        
+    </div>
+</div>
+<!-- Filter and Sort Section -->
+<div class="container my-4">
+    <div class="card p-4">
+        <h5 class="fw-bold mb-3">
+            <i class="fas fa-filter me-2"></i>Filter & Sort
+        </h5>
+        <form method="GET" action="{% url 'public_home' %}" class="row g-3">
+            <div class="col-md-3">
+                <label for="region" class="form-label">Region</label>
+                <select class="form-select" id="region" name="region">
+                    <option value="">All Regions</option>
+                    {% for area in all_areas %}
+                    <option value="{{ area.id }}" {% if selected_region == area.id|stringformat:"s" %}selected{% endif %}>
+                        {{ area.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="category" class="form-label">Items to Donate</label>
+                <select class="form-select" id="category" name="category">
+                    <option value="">All Categories</option>
+                    {% for category in all_categories %}
+                    <option value="{{ category.id }}" {% if selected_category == category.id|stringformat:"s" %}selected{% endif %}>
+                        {{ category.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label for="priority" class="form-label">Priority</label>
+                <select class="form-select" id="priority" name="priority">
+                    <option value="">All Priorities</option>
+                    <option value="urgent" {% if selected_priority == 'urgent' %}selected{% endif %}>Urgent</option>
+                    <option value="high" {% if selected_priority == 'high' %}selected{% endif %}>High</option>
+                    <option value="medium" {% if selected_priority == 'medium' %}selected{% endif %}>Medium</option>
+                    <option value="low" {% if selected_priority == 'low' %}selected{% endif %}>Low</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label for="sort" class="form-label">Sort By</label>
+                <select class="form-select" id="sort" name="sort">
+                    <option value="-created_at" {% if sort_by == '-created_at' %}selected{% endif %}>Newest First</option>
+                    <option value="priority" {% if sort_by == 'priority' %}selected{% endif %}>Priority</option>
+                    <option value="area" {% if sort_by == 'area' %}selected{% endif %}>Region</option>
+                    <option value="category" {% if sort_by == 'category' %}selected{% endif %}>Category</option>
+                </select>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-search me-2"></i>Filter
+                </button>
+            </div>
+        </form>
+        {% if selected_region or selected_category or selected_priority %}
+        <div class="mt-3">
+            <a href="{% url 'public_home' %}" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-times me-2"></i>Clear Filters
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- What's Needed Now -->
+<div class="container mb-5">
+    <div class="page-header">
+        <h2 class="fw-bold mb-3">
+            <i class="fas fa-list-alt me-2"></i>What's Needed Now
+        </h2>
+        <p class="text-muted">Current relief needs across all regions</p>
+    </div>
+    
+    {% if recent_needs %}
+    <div class="row g-4">
+        {% for need in recent_needs %}
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <h5 class="card-title">
+                                <i class="fas fa-map-marker-alt text-danger me-2"></i>
+                                {{ need.area.name }}
+                            </h5>
+                            <span class="badge bg-{% if need.need.priority == 'urgent' %}danger{% elif need.need.priority == 'high' %}warning{% elif need.need.priority == 'medium' %}info{% else %}secondary{% endif %}">
+                                {{ need.need.get_priority_display|default:'Medium' }}
+                            </span>
+                        </div>
+                        <p class="card-text">
+                            <i class="fas fa-box me-2"></i><strong>{{ need.product.name }}</strong><br>
+                            {% if need.category %}
+                            <strong>Category:</strong> {{ need.category.name }}<br>
+                            {% endif %}
+                            <strong>Quantity:</strong> {{ need.need.quantity }} {{ need.product.unit }}<br>
+                            {% if need.need.notes %}
+                                <strong>Notes:</strong> {{ need.need.notes }}
+                            {% endif %}
+                        </p>
+                        <a href="{% url 'public_area_detail' need.area.id %}" class="btn btn-sm btn-primary">
+                            View Region Details <i class="fas fa-arrow-right ms-2"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="card p-5 text-center">
+        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+        <p class="text-muted">No needs found matching your filters. Try adjusting your search criteria.</p>
+        <a href="{% url 'public_home' %}" class="btn btn-primary">Clear Filters</a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Coverage Map -->
+<div class="container mb-5">
+    <div class="page-header">
+        <h2 class="fw-bold mb-3">
+            <i class="fas fa-globe me-2"></i>Coverage Map
+        </h2>
+        <p class="text-muted">Browse relief needs by region</p>
+    </div>
+    
+    <div class="row g-4">
+        {% for area in all_areas|slice:":6" %}
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-building me-2 text-primary"></i>{{ area.name }}
+                        </h5>
+                        <p class="text-muted">{{ area.description }}</p>
+                        <p class="mb-1">
+                            <i class="fas fa-map-marker-alt me-2"></i><small>{{ area.address }}</small>
+                        </p>
+                        <p class="mb-2">
+                            <i class="fas fa-mail-bulk me-2"></i><strong>Zip Code:</strong> {{ area.pincode }}
+                        </p>
+                        <a href="{% url 'public_area_detail' area.id %}" class="btn btn-primary btn-sm">
+                            View Needs <i class="fas fa-arrow-right ms-2"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    <div class="text-center mt-4">
+        <a href="{% url 'public_areas' %}" class="btn btn-outline-primary">
+            View All Regions <i class="fas fa-arrow-right ms-2"></i>
+        </a>
+    </div>
+</div>
+{% endblock %}
+

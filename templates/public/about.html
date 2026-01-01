@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section">
+    <div class="container text-center">
+        <h1 class="display-8 fw-bold mb-8">
+            <i class="fas fa-hands-helping me-3"></i>About Us
+        </h1>        
+    </div>
+</div>
+
+<!-- About Content -->
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+             <div class="card p-4 mb-4">
+                <h4 class="fw-bold mb-3">
+                    <i class="fas fa-users text-success me-2"></i>You are the Heroes
+                </h4>
+                
+                <article aria-labelledby="mission-title" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:1.5rem; margin-bottom:1rem;">                
+                    <p>
+                    <strong>Hurricane Heroes</strong> is a community-driven platform created to support hurricane relief efforts. 
+                    Our mission is simple: <em>connect those who want to help with those who need help the most.</em>
+                    </p>
+                    <p>
+                    When hurricanes strike, shelters often struggle to communicate their urgent needs. At the same time, generous people want to donate but don’t know what’s required. 
+                    <strong>Hurricane Heroes</strong> bridges that gap by providing real-time information on what each hurricane relief center needs—whether it’s food, water, clothing, or other essentials.
+                    </p>                
+                </article>
+            </div>
+
+            <div class="card p-4 mb-4">
+                <h4 class="fw-bold mb-3">🎯 Mission</h4>               
+                
+                <article aria-labelledby="mission-title" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:1.5rem; margin-bottom:1rem;">
+                
+                <ul style="margin:0.5rem 0 0; padding-left:1.25rem; line-height:1.7;">
+                    <li>Connect donors with hurricane relief centers <strong>in real time</strong>.</li>
+                    <li>Ensure essential supplies reach the right places <strong>quickly and efficiently</strong>.</li>
+                    <li>Empower communities to <strong>recover faster</strong> after disasters.</li>
+                </ul>
+                </article>
+            </div>
+
+            <div class="card p-4 mb-4">                
+                <h4 class="fw-bold mb-3"><i class="fas fa-light fa-glasses me-2"></i> Vision                                
+                </h4>               
+                
+                <article aria-labelledby="vision-title" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:1.5rem; margin-bottom:1rem;">                    
+                    <ul style="margin:0.5rem 0 0; padding-left:1.25rem; line-height:1.7;">
+                        <li>A world where disaster response is <strong>seamless</strong> and technology bridges the gap between need and help.</li>
+                        <li>Communities that are <strong>resilient</strong>, supported, and able to rebuild stronger after every storm.</li>
+                        <li>A global network united by <strong>compassion</strong> and <strong>action</strong> during crises.</li>
+                    </ul>
+                </article>
+
+            </div>
+
+            <div class="card p-4 mb-4">
+                <h4 class="fw-bold mb-3">💙 Values</h4>
+                                
+                <!-- Values -->
+                <article aria-labelledby="values-title" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:1.5rem;">
+                
+                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:1rem; margin-top:0.75rem;">
+                    <div style="border:1px dashed #e5e7eb; border-radius:10px; padding:1rem;">
+                    <h4 style="margin:0 0 0.25rem; font-size:1.05rem; color:#0f172a;">Transparency</h4>
+                    <p style="margin:0; color:#475569;">Clear and accurate information about what is needed and where.</p>
+                    </div>
+                    <div style="border:1px dashed #e5e7eb; border-radius:10px; padding:1rem;">
+                    <h4 style="margin:0 0 0.25rem; font-size:1.05rem; color:#0f172a;">Empathy</h4>
+                    <p style="margin:0; color:#475569;">Understanding and prioritizing the needs of affected communities.</p>
+                    </div>
+                    <div style="border:1px dashed #e5e7eb; border-radius:10px; padding:1rem;">
+                    <h4 style="margin:0 0 0.25rem; font-size:1.05rem; color:#0f172a;">Collaboration</h4>
+                    <p style="margin:0; color:#475569;">Working together with shelters, donors, and volunteers.</p>
+                    </div>
+                    <div style="border:1px dashed #e5e7eb; border-radius:10px; padding:1rem;">
+                    <h4 style="margin:0 0 0.25rem; font-size:1.05rem; color:#0f172a;">Responsiveness</h4>
+                    <p style="margin:0; color:#475569;">Acting quickly to provide timely support during emergencies.</p>
+                    </div>
+                    <div style="border:1px dashed #e5e7eb; border-radius:10px; padding:1rem;">
+                    <h4 style="margin:0 0 0.25rem; font-size:1.05rem; color:#0f172a;">Integrity</h4>
+                    <p style="margin:0; color:#475569;">Maintaining trust and accountability in every interaction.</p>
+                    </div>
+                </div>
+                </article>
+
+            </div>
+           
+
+            <!-- Statistics -->
+            <div class="row g-3 mt-4">
+                <div class="col-md-6">
+                    <div class="stat-card card p-4 text-center">
+                        <i class="fas fa-map-marked-alt fa-2x mb-2"></i>
+                        <h3>{{ stats.total_areas }}</h3>
+                        <p class="mb-0">Coverage Map</p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="stat-card card p-4 text-center success">
+                        <i class="fas fa-box fa-2x mb-2"></i>
+                        <h3>{{ stats.total_products }}</h3>
+                        <p class="mb-0">Items to Donate</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section">
+    <div class="container text-center">
+        <h1 class="display-4 fw-bold mb-4">
+            <i class="fas fa-envelope me-3"></i>Contact Us
+        </h1>
+        <p class="lead mb-4">Get in touch with us for inquiries or support</p>
+    </div>
+</div>
+
+<!-- Contact Content -->
+<div class="container my-5">
+    <div class="row g-4">
+        <!-- Contact Form -->
+        <div class="col-lg-7">
+            <div class="page-header">
+                <h2 class="fw-bold mb-4">
+                    <i class="fas fa-paper-plane me-2"></i>Send Us a Message
+                </h2>
+            </div>
+            
+            <div class="card p-4">
+                <form method="POST" action="{% url 'public_contact' %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="name" class="form-label">
+                            <i class="fas fa-user me-2"></i>Full Name <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">
+                            <i class="fas fa-envelope me-2"></i>Email Address <span class="text-danger">*</span>
+                        </label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="subject" class="form-label">
+                            <i class="fas fa-tag me-2"></i>Subject <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" class="form-control" id="subject" name="subject" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="message" class="form-label">
+                            <i class="fas fa-comment me-2"></i>Message <span class="text-danger">*</span>
+                        </label>
+                        <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-paper-plane me-2"></i>Send Message
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Contact Information -->
+        <div class="col-lg-5">
+            <div class="page-header">
+                <h2 class="fw-bold mb-4">
+                    <i class="fas fa-info-circle me-2"></i>Contact Information
+                </h2>
+            </div>
+
+            <div class="card p-4 mb-3">
+                <div class="d-flex align-items-start">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-map-marker-alt fa-2x text-primary"></i>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h6 class="fw-bold">Office Address</h6>
+                        <p class="text-muted mb-0 small">
+                            Hurricane Heroes Relief Center<br>
+                            Disaster Management Division
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card p-4 mb-3">
+                <div class="d-flex align-items-start">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-envelope fa-2x text-success"></i>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h6 class="fw-bold">Email</h6>
+                        <p class="text-muted mb-0 small">
+                            <a href="mailto:info@hurricaneheroes.org" class="text-decoration-none">
+                                info@hurricaneheroes.org
+                            </a><br>
+                            <a href="mailto:support@hurricaneheroes.org" class="text-decoration-none">
+                                support@hurricaneheroes.org
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card p-4 mb-3">
+                <div class="d-flex align-items-start">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-phone fa-2x text-info"></i>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h6 class="fw-bold">Phone</h6>
+                        <p class="text-muted mb-0 small">
+                            Emergency: <a href="tel:+911234567890" class="text-decoration-none">+91 123 456 7890</a><br>
+                            Support: <a href="tel:+911234567891" class="text-decoration-none">+91 123 456 7891</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card p-4">
+                <div class="d-flex align-items-start">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-clock fa-2x text-warning"></i>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h6 class="fw-bold">Operating Hours</h6>
+                        <p class="text-muted mb-0 small">
+                            Monday - Friday: 9:00 AM - 6:00 PM<br>
+                            Saturday: 10:00 AM - 4:00 PM<br>
+                            <strong>24/7 during active disasters</strong>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

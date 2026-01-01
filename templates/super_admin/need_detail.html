@@ -1,0 +1,201 @@
+{% extends 'super_admin/base.html' %}
+
+{% block title %}Need Details - Super Admin{% endblock %}
+
+{% block super_admin_content %}
+<div class="page-header">
+    <a href="{% url 'super_admin_all_needs' %}" class="btn btn-outline-primary mb-3">
+        <i class="fas fa-arrow-left me-2"></i>Back to All Needs
+    </a>
+    <h2 class="fw-bold mb-3">
+        <i class="fas fa-info-circle me-2"></i>Need Details
+    </h2>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-list-alt me-2"></i>Need Information
+                </h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-borderless">
+                    <tr>
+                        <th width="30%">Need ID:</th>
+                        <td><strong>#{{ need.id }}</strong></td>
+                    </tr>
+                    <tr>
+                        <th>Region:</th>
+                        <td>
+                            <i class="fas fa-map-marker-alt text-danger me-2"></i>
+                            <strong>{{ area.name }}</strong>
+                            <br><small class="text-muted">{{ area.address }} - Zip Code: {{ area.pincode }}</small>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Product:</th>
+                        <td>
+                            <i class="fas fa-box text-primary me-2"></i>
+                            <strong>{{ product.name }}</strong>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Category:</th>
+                        <td>
+                            <span class="badge bg-info">{{ category.name }}</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Unit:</th>
+                        <td>
+                            <span class="badge bg-secondary">{{ product.unit }}</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Quantity Needed:</th>
+                        <td>
+                            <span class="badge bg-warning text-dark fs-6">{{ need.quantity }} {{ product.unit }}</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Priority:</th>
+                        <td>
+                            <span class="badge bg-{% if need.priority == 'urgent' %}danger{% elif need.priority == 'high' %}warning{% elif need.priority == 'medium' %}info{% else %}secondary{% endif %}">
+                                {{ need.get_priority_display }}
+                            </span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Status:</th>
+                        <td>
+                            <span class="badge bg-{% if need.status == 'fulfilled' %}success{% elif need.status == 'in_progress' %}info{% elif need.status == 'cancelled' %}secondary{% else %}warning{% endif %}">
+                                {{ need.get_status_display }}
+                            </span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Notes:</th>
+                        <td>
+                            {% if need.notes %}
+                                <i class="fas fa-sticky-note me-2"></i>{{ need.notes }}
+                            {% else %}
+                                <span class="text-muted">No notes</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Created By:</th>
+                        <td>
+                            {% if need.created_by %}
+                                <i class="fas fa-user me-2"></i>{{ need.created_by.username }}
+                            {% else %}
+                                <span class="text-muted">System</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Created At:</th>
+                        <td>
+                            <i class="fas fa-calendar me-2"></i>{{ need.created_at|date:"F d, Y H:i" }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Last Updated:</th>
+                        <td>
+                            <i class="fas fa-clock me-2"></i>{{ need.updated_at|date:"F d, Y H:i" }}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i>Quick Actions
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'super_admin_all_needs' %}" class="btn btn-primary">
+                        <i class="fas fa-list me-2"></i>Back to All Needs
+                    </a>
+                    <button class="btn btn-outline-danger" onclick="deleteNeed({{ need.id }}, '{{ product.name|escapejs }}', '{{ area.name|escapejs }}')">
+                        <i class="fas fa-trash me-2"></i>Delete This Need
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-map-marker-alt me-2"></i>Region Info
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-2">
+                    <strong>{{ area.name }}</strong>
+                </p>
+                <p class="mb-2 text-muted small">
+                    {{ area.description }}
+                </p>
+                <p class="mb-1 small">
+                    <i class="fas fa-map-marker-alt me-2"></i>{{ area.address }}
+                </p>
+                <p class="mb-0 small">
+                    <i class="fas fa-mail-bulk me-2"></i>Zip Code: {{ area.pincode }}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function deleteNeed(needId, productName, areaName) {
+    if (confirm(`Are you sure you want to delete the need for "${productName}" in "${areaName}"?`)) {
+        const csrftoken = getCookie('csrftoken');
+        fetch(`/super-admin/need/${needId}/delete/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrftoken,
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.href = '{% url "super_admin_all_needs" %}';
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while deleting the need.');
+        });
+    }
+}
+</script>
+{% endblock %}
+

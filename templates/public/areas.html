@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="page-header">
+        <h2 class="fw-bold mb-3">
+            <i class="fas fa-globe me-2"></i>Coverage Map
+        </h2>
+        <p class="text-muted">Select a region to view what's needed now</p>
+    </div>
+    
+    <div class="row g-4">
+        {% for area in areas %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="text-center mb-3">
+                            <i class="fas fa-map-marker-alt fa-3x text-primary"></i>
+                        </div>
+                        <h4 class="card-title text-center mb-3">{{ area.name }}</h4>
+                        <p class="text-muted text-center mb-3">{{ area.description }}</p>
+                        <p class="text-center mb-2"><small class="text-muted">{{ area.address }}</small></p>
+                        <div class="text-center mb-3">
+                            <span class="badge bg-light text-dark">
+                                <i class="fas fa-mail-bulk me-2"></i>Zip Code: {{ area.pincode }}
+                            </span>
+                        </div>
+                        <div class="d-grid">
+                            <a href="{% url 'public_area_detail' area.id %}" class="btn btn-primary">
+                                View What's Needed Now <i class="fas fa-arrow-right ms-2"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+

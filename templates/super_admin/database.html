@@ -1,0 +1,119 @@
+{% extends 'super_admin/base.html' %}
+
+{% block title %}Database Management - Hurricane Heroes{% endblock %}
+
+{% block super_admin_content %}
+<div class="page-header">
+    <h2 class="fw-bold mb-3">
+        <i class="fas fa-database me-2"></i>Database Management
+    </h2>
+    <p class="text-muted">Export and import your database backup files</p>
+</div>
+
+<!-- Database Info Card -->
+<div class="card mb-4">
+    <div class="card-header bg-info text-white">
+        <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Current Database Information</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <p><strong><i class="fas fa-file me-2"></i>Database Path:</strong></p>
+                <code class="d-block p-2 bg-light rounded">{{ db_path }}</code>
+            </div>
+            <div class="col-md-3">
+                <p><strong><i class="fas fa-hdd me-2"></i>Database Size:</strong></p>
+                <h5 class="text-primary">{{ db_size_mb }} MB</h5>
+            </div>
+            <div class="col-md-3">
+                <p><strong><i class="fas fa-clock me-2"></i>Last Modified:</strong></p>
+                <p class="mb-0">{{ db_modified|date:"F d, Y H:i"|default:"N/A" }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Export Section -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card border-success">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-download me-2"></i>Export Database</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">Download a complete backup of your database as a SQL file.</p>
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Warning:</strong> This will create a complete backup of all your data. Keep this file safe!
+                </div>
+                <a href="{% url 'export_database' %}" class="btn btn-success btn-lg w-100">
+                    <i class="fas fa-download me-2"></i>Export Database Backup
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Section -->
+    <div class="col-md-6">
+        <div class="card border-primary">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-upload me-2"></i>Import Database</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">Restore your database from a previously exported SQL backup file.</p>
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <strong>Important:</strong> This will replace all current data with the imported data. A safety backup will be created automatically.
+                </div>
+                <form method="POST" action="{% url 'import_database' %}" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="sql_file" class="form-label">
+                            <i class="fas fa-file-upload me-2"></i>Select SQL Backup File
+                        </label>
+                        <input type="file" class="form-control" id="sql_file" name="sql_file" accept=".sql" required>
+                        <small class="form-text text-muted">Only .sql files are accepted</small>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-lg w-100" onclick="return confirm('Are you sure you want to import this database? All current data will be replaced!');">
+                        <i class="fas fa-upload me-2"></i>Import Database
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Instructions -->
+<div class="card">
+    <div class="card-header bg-secondary text-white">
+        <h5 class="mb-0"><i class="fas fa-book me-2"></i>Instructions</h5>
+    </div>
+    <div class="card-body">
+        <h6><i class="fas fa-download me-2 text-success"></i>Export Database:</h6>
+        <ol>
+            <li>Click the "Export Database Backup" button</li>
+            <li>The backup file will be downloaded automatically</li>
+            <li>Save the file in a safe location</li>
+            <li>The file name will include a timestamp (e.g., backup_20251210_011944.sql)</li>
+        </ol>
+        
+        <hr>
+        
+        <h6><i class="fas fa-upload me-2 text-primary"></i>Import Database:</h6>
+        <ol>
+            <li>Click "Choose File" and select your SQL backup file</li>
+            <li>Click "Import Database" button</li>
+            <li>Confirm the import action</li>
+            <li>A safety backup of your current database will be created automatically</li>
+            <li>Your database will be restored from the selected file</li>
+        </ol>
+        
+        <div class="alert alert-info mt-3">
+            <i class="fas fa-lightbulb me-2"></i>
+            <strong>Tip:</strong> Always export your database before making major changes or importing new data. This way you can restore if something goes wrong.
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+

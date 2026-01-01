@@ -1,0 +1,172 @@
+{% extends 'area_admin/base.html' %}
+
+{% block title %}Shelter Admin Dashboard - Hurricane Heroes{% endblock %}
+
+{% block area_admin_content %}
+<div class="page-header">
+    <h2 class="fw-bold mb-3">
+        <i class="fas fa-tachometer-alt me-2"></i>Shelter Admin Dashboard
+    </h2>
+    <p class="text-muted">Welcome back, {{ request.user.get_full_name|default:request.user.username }}!</p>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card stat-card p-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h3 class="mb-0">{{ total_needs }}</h3>
+                    <p class="mb-0">What's Needed Now</p>
+                </div>
+                <i class="fas fa-exclamation-triangle fa-2x"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card stat-card success p-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h3 class="mb-0">{{ area.name }}</h3>
+                    <p class="mb-0">Assigned Region</p>
+                </div>
+                <i class="fas fa-map-marker-alt fa-2x"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card stat-card warning p-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h3 class="mb-0">{{ categories|length }}</h3>
+                    <p class="mb-0">Categories</p>
+                </div>
+                <i class="fas fa-folder fa-2x"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card stat-card info p-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h3 class="mb-0">{{ products|length }}</h3>
+                    <p class="mb-0">Items to Donate</p>
+                </div>
+                <i class="fas fa-box fa-2x"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Area Info -->
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Assigned Region Information</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <p><strong>Region Name:</strong> {{ area.name }}</p>
+                <p><strong>Description:</strong> {{ area.description }}</p>
+                <p><strong>Address:</strong> {{ area.address }}</p>
+            </div>
+            <div class="col-md-6">
+                <p><strong>Zip Code:</strong> {{ area.pincode }}</p>
+                <p><strong>Region ID:</strong> {{ area.id }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Needs -->
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="fas fa-list-alt me-2"></i>What's Needed Now</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Items to Donate</th>
+                        <th>Category</th>
+                        <th>Quantity</th>
+                        <th>Priority</th>
+                        <th>Status</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for need in needs %}
+                        <tr>
+                            <td><strong>{{ need.product.name }}</strong></td>
+                            <td><span class="badge bg-info">{{ need.product.category.name }}</span></td>
+                            <td><span class="badge bg-warning text-dark">{{ need.quantity }} {{ need.product.unit }}</span></td>
+                            <td>
+                                {% if need.priority == 'urgent' %}
+                                    <span class="badge bg-danger">{{ need.get_priority_display }}</span>
+                                {% elif need.priority == 'high' %}
+                                    <span class="badge bg-warning text-dark">{{ need.get_priority_display }}</span>
+                                {% elif need.priority == 'medium' %}
+                                    <span class="badge bg-info">{{ need.get_priority_display }}</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ need.get_priority_display }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if need.status == 'pending' %}
+                                    <span class="badge bg-warning text-dark">{{ need.get_status_display }}</span>
+                                {% elif need.status == 'in_progress' %}
+                                    <span class="badge bg-info">{{ need.get_status_display }}</span>
+                                {% elif need.status == 'fulfilled' %}
+                                    <span class="badge bg-success">{{ need.get_status_display }}</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ need.get_status_display }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if need.notes %}
+                                    {{ need.notes }}
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">No needs recorded yet</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="card mt-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <a href="{% url 'area_admin_needs' %}" class="btn btn-primary w-100">
+                    <i class="fas fa-plus-circle me-2"></i>Add New Need
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a href="{% url 'area_admin_needs' %}" class="btn btn-outline-primary w-100">
+                    <i class="fas fa-edit me-2"></i>Manage Needs
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a href="{% url 'area_admin_products' %}" class="btn btn-outline-primary w-100">
+                    <i class="fas fa-box me-2"></i>View Items to Donate
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

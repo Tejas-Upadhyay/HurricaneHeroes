@@ -1,0 +1,170 @@
+{% extends 'super_admin/base.html' %}
+
+{% block title %}Super Admin Dashboard - Hurricane Heroes{% endblock %}
+
+{% block super_admin_content %}
+<div class="page-header">
+    <h2 class="fw-bold mb-3">
+        <i class="fas fa-crown me-2"></i>Super Admin Dashboard
+    </h2>
+    <p class="text-muted">Complete overview of the relief management system</p>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card stat-card p-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h3 class="mb-0">{{ stats.total_areas }}</h3>
+                    <p class="mb-0">Coverage Map</p>
+                </div>
+                <i class="fas fa-globe fa-2x"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card stat-card success p-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h3 class="mb-0">{{ stats.total_needs }}</h3>
+                    <p class="mb-0">What's Needed Now</p>
+                </div>
+                <i class="fas fa-exclamation-triangle fa-2x"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card stat-card warning p-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h3 class="mb-0">{{ stats.total_products }}</h3>
+                    <p class="mb-0">Items to Donate</p>
+                </div>
+                <i class="fas fa-box fa-2x"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card stat-card info p-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h3 class="mb-0">{{ stats.total_area_admins }}</h3>
+                    <p class="mb-0">Shelter Admins</p>
+                </div>
+                <i class="fas fa-users fa-2x"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Needs -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-list-alt me-2"></i>What's Needed Now Across All Regions</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Region</th>
+                                <th>Items to Donate</th>
+                                <th>Category</th>
+                                <th>Quantity</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for need in needs %}
+                                <tr>
+                                    <td>
+                                        <i class="fas fa-map-marker-alt me-2 text-danger"></i>
+                                        <strong>{{ need.area.name }}</strong>
+                                    </td>
+                                    <td>{{ need.product.name }}</td>
+                                    <td><span class="badge bg-info">{{ need.product.category.name }}</span></td>
+                                    <td><span class="badge bg-warning text-dark">{{ need.quantity }} {{ need.product.unit }}</span></td>
+                                    <td>
+                                        {% if need.notes %}
+                                            {{ need.notes }}
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted">No needs recorded yet</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Areas Overview -->
+<div class="row">
+    {% for area in areas %}
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-map-marker-alt me-2 text-primary"></i>{{ area.name }}
+                    </h5>
+                    <p class="text-muted">{{ area.description }}</p>
+                    <p><small>{{ area.address }}</small></p>
+                    <p><i class="fas fa-mail-bulk me-2"></i><strong>Zip Code:</strong> {{ area.pincode }}</p>
+                    <a href="{% url 'super_admin_all_needs' %}" class="btn btn-sm btn-outline-primary">
+                        View Details <i class="fas fa-arrow-right ms-2"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+<!-- Quick Actions -->
+<div class="card mt-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-3">
+                <a href="{% url 'super_admin_areas' %}" class="btn btn-primary w-100">
+                    <i class="fas fa-plus-circle me-2"></i>Add Area
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="{% url 'super_admin_area_admins' %}" class="btn btn-outline-primary w-100">
+                    <i class="fas fa-user-plus me-2"></i>Add Shelter Admin
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="{% url 'super_admin_all_needs' %}" class="btn btn-outline-primary w-100">
+                    <i class="fas fa-list me-2"></i>View All Needs
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="{% url 'public_home' %}" class="btn btn-outline-secondary w-100" target="_blank">
+                    <i class="fas fa-eye me-2"></i>View Public Site
+                </a>
+            </div>
+        </div>
+        <div class="row g-3 mt-2">
+            <div class="col-md-6">
+                <a href="{% url 'database_management' %}" class="btn btn-outline-info w-100">
+                    <i class="fas fa-database me-2"></i>Database Import/Export
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

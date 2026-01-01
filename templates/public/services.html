@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section">
+    <div class="container text-center">
+        <h1 class="display-8 fw-bold mb-8">
+            <i class="fa-brands fa-servicestack"></i>Services<i class="fa-brands fa-servicestack fa-flip-horizontal"></i>
+        </h1>        
+    </div>
+</div>
+
+<!-- Services Content -->
+<div class="container my-5">
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="card h-100 p-4">
+                <div class="text-center mb-3">
+                    <i class="fas fa-clipboard-list fa-3x text-primary"></i>
+                </div>
+                <h4 class="fw-bold text-center mb-3">Real-Time Needs Dashboard</h4>
+                <p class="text-muted text-center">
+                    See exactly what each relief center needs (food, water, clothing, medical supplies) updated in real time..
+                </p>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card h-100 p-4">
+                <div class="text-center mb-3">
+                    <i class="fas fa-chart-pie fa-3x text-success"></i>
+                </div>
+                <h4 class="fw-bold text-center mb-3">Smart Donation Matching</h4>
+                <p class="text-muted text-center">
+                    Match your donation to centers that need it most—reducing waste and speeding delivery.
+                </p>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card h-100 p-4">
+                <div class="text-center mb-3">
+                    <i class="fas fa-users-cog fa-3x text-info"></i>
+                </div>
+                <h4 class="fw-bold text-center mb-3">Shelter Administration</h4>
+                <p class="text-muted text-center">
+                    Dedicated shelter administrators manage relief efforts for their specific regions with 
+                    region-specific dashboards and local need management.
+                </p>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card h-100 p-4">
+                <div class="text-center mb-3">
+                    <i class="fas fa-chart-bar fa-3x text-warning"></i>
+                </div>
+                <h4 class="fw-bold text-center mb-3">Analytics & Reporting</h4>
+                <p class="text-muted text-center">
+                    Comprehensive analytics and reporting tools provide insights into relief operations 
+                    with real-time statistics and progress monitoring.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Categories -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="page-header text-center">
+                <h2 class="fw-bold mb-4">Relief Categories</h2>
+            </div>
+        </div>
+        {% for category in categories %}
+        <div class="col-md-6 col-lg-3 mb-3">
+            <div class="card h-100 text-center p-3">
+                <i class="fas fa-{% if 'food' in category.name.lower %}utensils{% elif 'medicine' in category.name.lower %}pills{% elif 'shelter' in category.name.lower %}home{% elif 'clothing' in category.name.lower %}tshirt{% else %}box{% endif %} fa-2x text-primary mb-2"></i>
+                <h6 class="fw-bold">{{ category.name }}</h6>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
