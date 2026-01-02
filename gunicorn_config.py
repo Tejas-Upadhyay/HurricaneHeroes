@@ -5,7 +5,7 @@ import multiprocessing
 import os
 
 # Server socket
-bind = "unix:/home/django/projects/hurricane-heroes/gunicorn.sock"
+bind = "unix:/home/django/projects/hurricaneHeroes/gunicorn.sock"
 backlog = 2048
 
 # Worker processes
@@ -22,7 +22,7 @@ loglevel = "info"
 access_log_format = '%(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"'
 
 # Process naming
-proc_name = "hurricane-heroes"
+proc_name = "hurricaneHeroes"
 
 # Server mechanics
 daemon = False

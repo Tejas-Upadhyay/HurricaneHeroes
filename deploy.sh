@@ -24,7 +24,7 @@ if [ "$USER" != "django" ]; then
 fi
 
 # Navigate to project directory
-PROJECT_DIR="$HOME/projects/hurricane-heroes"
+PROJECT_DIR="$HOME/projects/hurricaneHeroes"
 cd "$PROJECT_DIR" || exit 1
 
 echo -e "${GREEN}✓ Project directory: $PROJECT_DIR${NC}"
