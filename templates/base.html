@@ -148,6 +148,21 @@
             padding: 2rem 0;
             margin-top: 3rem;
         }
+        
+        /* below use to collapse and expand filter */
+        /* Rotate chevron when expanded */
+        [aria-expanded="true"] .transition-icon {
+            transform: rotate(180deg);
+        }
+
+        .transition-icon {
+            transition: transform 0.3s ease;
+        }
+
+        /* Ensure the header highlights slightly on hover */
+        .card [data-bs-toggle="collapse"]:hover {
+            background-color: #f8fafc !important;
+        }
     </style>
 </head>
 <body>

@@ -190,6 +190,7 @@
         transform: translateY(-2px);
         box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
     }
+    
 </style>
 {% endblock %}
 
@@ -204,65 +205,72 @@
 </div>
 <!-- Filter and Sort Section -->
 <div class="container my-4">
-    <div class="card p-4">
-        <h5 class="fw-bold mb-3">
-            <i class="fas fa-filter me-2"></i>Filter & Sort
-        </h5>
-        <form method="GET" action="{% url 'public_home' %}" class="row g-3">
-            <div class="col-md-3">
-                <label for="region" class="form-label">Region</label>
-                <select class="form-select" id="region" name="region">
-                    <option value="">All Regions</option>
-                    {% for area in all_areas %}
-                    <option value="{{ area.id }}" {% if selected_region == area.id|stringformat:"s" %}selected{% endif %}>
-                        {{ area.name }}
-                    </option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col-md-3">
-                <label for="category" class="form-label">Items to Donate</label>
-                <select class="form-select" id="category" name="category">
-                    <option value="">All Categories</option>
-                    {% for category in all_categories %}
-                    <option value="{{ category.id }}" {% if selected_category == category.id|stringformat:"s" %}selected{% endif %}>
-                        {{ category.name }}
-                    </option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col-md-2">
-                <label for="priority" class="form-label">Priority</label>
-                <select class="form-select" id="priority" name="priority">
-                    <option value="">All Priorities</option>
-                    <option value="urgent" {% if selected_priority == 'urgent' %}selected{% endif %}>Urgent</option>
-                    <option value="high" {% if selected_priority == 'high' %}selected{% endif %}>High</option>
-                    <option value="medium" {% if selected_priority == 'medium' %}selected{% endif %}>Medium</option>
-                    <option value="low" {% if selected_priority == 'low' %}selected{% endif %}>Low</option>
-                </select>
-            </div>
-            <div class="col-md-2">
-                <label for="sort" class="form-label">Sort By</label>
-                <select class="form-select" id="sort" name="sort">
-                    <option value="-created_at" {% if sort_by == '-created_at' %}selected{% endif %}>Newest First</option>
-                    <option value="priority" {% if sort_by == 'priority' %}selected{% endif %}>Priority</option>
-                    <option value="area" {% if sort_by == 'area' %}selected{% endif %}>Region</option>
-                    <option value="category" {% if sort_by == 'category' %}selected{% endif %}>Category</option>
-                </select>
-            </div>
-            <div class="col-md-2 d-flex align-items-end">
-                <button type="submit" class="btn btn-primary w-100">
-                    <i class="fas fa-search me-2"></i>Filter
-                </button>
-            </div>
-        </form>
-        {% if selected_region or selected_category or selected_priority %}
-        <div class="mt-3">
-            <a href="{% url 'public_home' %}" class="btn btn-sm btn-outline-secondary">
-                <i class="fas fa-times me-2"></i>Clear Filters
-            </a>
+    <div class="card p-0 overflow-hidden"> <!-- Added p-0 and overflow-hidden for cleaner collapse -->
+        
+        <!-- Clickable Header Toggle -->
+        <div class="p-4 bg-white" 
+             style="cursor: pointer;" 
+             data-bs-toggle="collapse" 
+             data-bs-target="#filterCollapse" 
+             aria-expanded="false" 
+             aria-controls="filterCollapse">
+            <h5 class="fw-bold mb-0 d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-filter me-2 text-primary"></i>Filter & Sort</span>
+                <i class="fas fa-chevron-down transition-icon"></i>
+            </h5>
         </div>
-        {% endif %}
+
+        <!-- Collapsible Content -->
+        <div class="collapse" id="filterCollapse">
+            <div class="p-4 pt-0"> <!-- Padding for the form inside -->
+                <form method="GET" action="{% url 'public_home' %}" class="row g-3">
+                    <div class="col-md-3">
+                        <label for="region" class="form-label">Region</label>
+                        <select class="form-select" id="region" name="region">
+                            <option value="">All Regions</option>
+                            {% for area in all_areas %}
+                            <option value="{{ area.id }}" {% if selected_region == area.id|stringformat:"s" %}selected{% endif %}>
+                                {{ area.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="category" class="form-label">Items to Donate</label>
+                        <select class="form-select" id="category" name="category">
+                            <option value="">All Categories</option>
+                            {% for category in all_categories %}
+                            <option value="{{ category.id }}" {% if selected_category == category.id|stringformat:"s" %}selected{% endif %}>
+                                {{ category.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="priority" class="form-label">Priority</label>
+                        <select class="form-select" id="priority" name="priority">
+                            <option value="">All Priorities</option>
+                            <option value="urgent" {% if selected_priority == 'urgent' %}selected{% endif %}>Urgent</option>
+                            <option value="high" {% if selected_priority == 'high' %}selected{% endif %}>High</option>
+                            <option value="medium" {% if selected_priority == 'medium' %}selected{% endif %}>Medium</option>
+                            <option value="low" {% if selected_priority == 'low' %}selected{% endif %}>Low</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="sort" class="form-label">Sort By</label>
+                        <select class="form-select" id="sort" name="sort">
+                            <option value="-created_at" {% if sort_by == '-created_at' %}selected{% endif %}>Newest First</option>
+                            <option value="priority" {% if sort_by == 'priority' %}selected{% endif %}>Priority</option>
+                            <option value="area" {% if sort_by == 'area' %}selected{% endif %}>Region</option>
+                            <option value="category" {% if sort_by == 'category' %}selected{% endif %}>Category</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">Apply</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 
