@@ -1,5 +1,11 @@
 {% extends 'base.html' %}
 
+{% block title %}{{ area.name }} – Current Needs & Donation List | Hurricane Heroes{% endblock %}
+
+{% block meta_description %}
+See what’s needed now at {{ area.name }}: description, address, and a real-time list of items to donate. Help meet urgent needs for this Southwest Florida hurricane relief center.
+{% endblock %}
+
 {% block extra_css %}
 <style>
     .region-header {
