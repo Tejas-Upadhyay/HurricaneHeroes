@@ -16,7 +16,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'CHANGE-THIS-IN-PRODUCTION')
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
 # Allowed hosts - Add your domain and EC2 IP
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'southwestfloridahurricaneheroes.com,localhost,127.0.0.1,18.191.99.182').split(',')
 
 # Database
 # For production, consider using PostgreSQL instead of SQLite
