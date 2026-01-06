@@ -1,0 +1,8 @@
+User-agent: *
+Disallow: /admin/
+Disallow: /private/
+Disallow: /temp/
+
+Allow: /public/
+
+Sitemap: https://southwestfloridahurricaneheroes.com/sitemap.xml
