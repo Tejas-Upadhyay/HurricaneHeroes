@@ -45,12 +45,12 @@ class Command(BaseCommand):
         # Create Areas
         self.stdout.write('Creating areas...')
         areas_data = [
-            {'id': 1, 'name': 'Mumbai District', 'description': 'Mumbai metropolitan area', 
-             'address': 'Mumbai, Maharashtra, India', 'pincode': '400001'},
-            {'id': 2, 'name': 'Pune District', 'description': 'Pune city and surrounding areas', 
-             'address': 'Pune, Maharashtra, India', 'pincode': '411001'},
-            {'id': 3, 'name': 'Delhi District', 'description': 'Delhi NCR region', 
-             'address': 'New Delhi, Delhi, India', 'pincode': '110001'},
+            {'id': 1, 'name': 'Alico Arena Shelter', 'description': 'Primary evacuation refuge on FGCU campus', 
+             'address': '12181 FGCU Lake Pkwy, Fort Myers, FL', 'pincode': '33965'},
+            {'id': 2, 'name': 'Estero Recreation Center', 'description': 'Community storm shelter & disaster relief depot', 
+             'address': '9200 Corkscrew Palms Blvd, Estero, FL', 'pincode': '33928'},
+            {'id': 3, 'name': 'Naples High School Shelter', 'description': 'Collier County public emergency shelter', 
+             'address': '1100 Golden Eagle Cir, Naples, FL', 'pincode': '34102'},
         ]
         
         areas = {}
@@ -100,9 +100,9 @@ class Command(BaseCommand):
         # Create Area Admin Users
         self.stdout.write('Creating area admin users...')
         area_admins_data = [
-            {'name': 'Rajesh Kumar', 'email': 'rajesh@relief.com', 'area': areas[1]},
-            {'name': 'Priya Sharma', 'email': 'priya@relief.com', 'area': areas[2]},
-            {'name': 'Amit Patel', 'email': 'amit@relief.com', 'area': areas[3]},
+            {'name': 'Sarah Jenkins', 'email': 'sarah@relief.com', 'area': areas[1]},
+            {'name': 'Marcus Vance', 'email': 'marcus@relief.com', 'area': areas[2]},
+            {'name': 'David Miller', 'email': 'david@relief.com', 'area': areas[3]},
         ]
         
         area_admins_created = []

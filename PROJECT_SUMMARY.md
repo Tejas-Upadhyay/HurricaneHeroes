@@ -94,9 +94,9 @@ pythonpro/
 ## 🗂️ Static Data Included
 
 ### Areas (3)
-- Mumbai District
-- Pune District
-- Delhi District
+- Alico Arena Shelter (Fort Myers, FL - 33965)
+- Estero Recreation Center (Estero, FL - 33928)
+- Naples High School Shelter (Naples, FL - 34102)
 
 ### Categories (4)
 - Food

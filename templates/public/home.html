@@ -1,197 +1,6 @@
 {% extends 'base.html' %}
 
 {% block extra_css %}
-<style>
-    
-    
-    @keyframes shine {
-        0% {
-            transform: translateX(-100%) translateY(-100%) rotate(45deg);
-        }
-        100% {
-            transform: translateX(100%) translateY(100%) rotate(45deg);
-        }
-    }
-    
-    
-    .stat-card {
-        backdrop-filter: blur(10px);
-        background: rgba(255, 255, 255, 0.15) !important;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        transition: all 0.3s ease;
-    }
-    
-    .stat-card:hover {
-        transform: translateY(-8px) scale(1.05);
-        background: rgba(255, 255, 255, 0.25) !important;
-        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
-    }
-    
-    .stat-card.success {
-        background: rgba(17, 153, 142, 0.2) !important;
-        border-color: rgba(56, 239, 125, 0.3);
-    }
-    
-    .stat-card.warning {
-        background: rgba(240, 147, 251, 0.2) !important;
-        border-color: rgba(245, 87, 108, 0.3);
-    }
-    
-    .stat-card.info {
-        background: rgba(79, 172, 254, 0.2) !important;
-        border-color: rgba(0, 242, 254, 0.3);
-    }
-    
-    @media (max-width: 768px) {
-        .hero-section {
-            min-height: 45px;
-            padding: 0.5rem 1rem;
-            background-attachment: scroll;
-        }
-        
-        .hero-section h1 {
-            font-size: 1.6rem;
-        }
-        
-        .hero-section .lead {
-            font-size: 0.75rem;
-        }
-        
-        .hero-icon {
-            font-size: 1.8rem;
-            margin-bottom: 0.2rem;
-        }
-    }
-    
-    /* Enhanced Card Design */
-    .card {
-        border: none;
-        border-radius: 16px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        overflow: hidden;
-    }
-    
-    .card:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-    }
-    
-    .card-body {
-        padding: 1.5rem;
-    }
-    
-    /* Enhanced Filter Section */
-    .container .card.p-4 {
-        border-radius: 16px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-        border: 1px solid rgba(0, 0, 0, 0.05);
-    }
-    
-    .form-select, .form-control {
-        border-radius: 10px;
-        border: 1.5px solid #e2e8f0;
-        transition: all 0.3s ease;
-    }
-    
-    .form-select:focus, .form-control:focus {
-        border-color: #0b34ebff;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-    }
-    
-    .btn-primary {
-        background: linear-gradient(135deg, #0b34ebff 0%, #188686ff 100%);
-        border: none;
-        border-radius: 10px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-    }
-    
-    .btn-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-    }
-    
-    /* Enhanced Page Header */
-    .page-header {
-        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-        padding: 2rem;
-        border-radius: 16px;
-        margin-bottom: 2rem;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-        border-left: 4px solid #0b34ebff;
-    }
-    
-    /* Badge Enhancements */
-    .badge {
-        padding: 0.5rem 1rem;
-        border-radius: 20px;
-        font-weight: 600;
-        font-size: 0.75rem;
-        letter-spacing: 0.5px;
-    }
-    
-    /* Enhanced Stat Cards */
-    .stat-card {
-        backdrop-filter: blur(15px);
-        background: rgba(255, 255, 255, 0.2) !important;
-        border: 1.5px solid rgba(255, 255, 255, 0.3);
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        border-radius: 16px;
-    }
-    
-    .stat-card:hover {
-        transform: translateY(-10px) scale(1.08);
-        background: rgba(255, 255, 255, 0.3) !important;
-        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
-    }
-    
-    .stat-card.success {
-        background: rgba(17, 153, 142, 0.25) !important;
-        border-color: rgba(56, 239, 125, 0.4);
-    }
-    
-    .stat-card.warning {
-        background: rgba(240, 147, 251, 0.25) !important;
-        border-color: rgba(245, 87, 108, 0.4);
-    }
-    
-    .stat-card.info {
-        background: rgba(79, 172, 254, 0.25) !important;
-        border-color: rgba(0, 242, 254, 0.4);
-    }
-    
-    /* Smooth Animations */
-    * {
-        transition: background-color 0.3s ease, color 0.3s ease;
-    }
-    
-    /* Enhanced Grid Layout */
-    .row.g-4 > * {
-        padding: 0.75rem;
-    }
-    
-    /* Button Enhancements */
-    .btn-sm {
-        border-radius: 8px;
-        font-weight: 500;
-        padding: 0.4rem 1rem;
-    }
-    
-    .btn-outline-primary {
-        border-width: 2px;
-        border-radius: 10px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-    
-    .btn-outline-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-    }
-    
-</style>
 {% endblock %}
 
 {% block title %}SWFL Hurricane Relief & Item Donations | SWFL Hurricane Heroes{% endblock %}
@@ -217,16 +26,16 @@ Donate items to SWFL hurricane relief efforts. Find local shelters in Southwest 
     <div class="card p-0 overflow-hidden"> <!-- Added p-0 and overflow-hidden for cleaner collapse -->
         
         <!-- Clickable Header Toggle -->
-        <div class="p-4 bg-white" 
+        <div class="p-4" 
              style="cursor: pointer;" 
              data-bs-toggle="collapse" 
              data-bs-target="#filterCollapse" 
              aria-expanded="false" 
              aria-controls="filterCollapse">
-            <h5 class="fw-bold mb-0 d-flex justify-content-between align-items-center">
-                <span><i class="fas fa-filter me-2 text-primary"></i>Filter & Sort</span>
-                <i class="fas fa-chevron-down transition-icon"></i>
-            </h5>
+             <h5 class="fw-bold mb-0 d-flex justify-content-between align-items-center">
+                 <span><i class="fas fa-filter me-2 text-primary"></i>Filter & Sort</span>
+                 <i class="fas fa-chevron-down transition-icon"></i>
+             </h5>
         </div>
 
         <!-- Collapsible Content -->
@@ -312,7 +121,7 @@ Donate items to SWFL hurricane relief efforts. Find local shelters in Southwest 
                             {% if need.category %}
                             <strong>Category:</strong> {{ need.category.name }}<br>
                             {% endif %}
-                            <strong>Quantity:</strong> {{ need.need.quantity }} {{ need.product.unit }}<br>
+                            <strong>Quantity:</strong> <span class="text-mono">{{ need.need.quantity }}</span> {{ need.product.unit }}<br>
                             {% if need.need.notes %}
                                 <strong>Notes:</strong> {{ need.need.notes }}
                             {% endif %}
@@ -356,7 +165,7 @@ Donate items to SWFL hurricane relief efforts. Find local shelters in Southwest 
                             <i class="fas fa-map-marker-alt me-2"></i><small>{{ area.address }}</small>
                         </p>
                         <p class="mb-2">
-                            <i class="fas fa-mail-bulk me-2"></i><strong>Zip Code:</strong> {{ area.pincode }}
+                            <i class="fas fa-mail-bulk me-2"></i><strong>Zip Code:</strong> <span class="text-mono">{{ area.pincode }}</span>
                         </p>
                         <a href="{% url 'public_area_detail' area.id %}" class="btn btn-primary btn-sm">
                             View Needs <i class="fas fa-arrow-right ms-2"></i>

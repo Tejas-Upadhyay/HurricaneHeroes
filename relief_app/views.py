@@ -1,6 +1,6 @@
 """
 Views for Hurricane Heroes
-All data is now dynamic from database
+All data is now dynamic from database, using Django forms for validation
 """
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
@@ -23,6 +23,7 @@ from datetime import datetime
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 from .models import Area, Category, Product, Need, AreaAdmin, Contact
+from .forms import AreaForm, NeedForm, CategoryForm, ProductForm, AreaAdminForm, ContactForm
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -160,33 +161,25 @@ def public_services(request):
 
 
 def public_contact(request):
-    """Contact page for public users"""
+    """Contact page for public users using ContactForm validation"""
     if request.method == 'POST':
-        # Handle contact form submission
-        name = request.POST.get('name')
-        email = request.POST.get('email')
-        subject = request.POST.get('subject')
-        message = request.POST.get('message')
-        
-        if name and email and subject and message:
+        form = ContactForm(request.POST)
+        if form.is_valid():
             try:
-                # Save contact form submission to database
-                contact = Contact.objects.create(
-                    name=name,
-                    email=email,
-                    subject=subject,
-                    message=message,
-                    status='new'
-                )
+                form.save()
                 messages.success(request, 'Thank you for contacting us! We will get back to you soon.')
+                return redirect('public_contact')
             except Exception as e:
-                messages.error(request, f'Error saving your message. Please try again.')
+                messages.error(request, 'Error saving your message. Please try again.')
         else:
-            messages.error(request, 'Please fill in all required fields.')
+            messages.error(request, 'Please fill in all required fields correctly.')
+    else:
+        form = ContactForm()
     
     areas = Area.objects.all()
     context = {
         'areas': areas,
+        'form': form,
     }
     return render(request, 'public/contact.html', context)
 
@@ -258,7 +251,7 @@ def area_admin_dashboard(request):
 
 @login_required
 def area_admin_needs(request):
-    """Manage needs for area admin"""
+    """Manage needs for area admin using NeedForm"""
     if request.user.user_type != 'area_admin':
         messages.error(request, 'Access denied')
         return redirect('login')
@@ -274,42 +267,32 @@ def area_admin_needs(request):
     # Handle POST request to create/update need
     if request.method == 'POST':
         need_id = request.POST.get('need_id')
-        product_id = request.POST.get('product_id')
-        quantity = request.POST.get('quantity')
-        priority = request.POST.get('priority', 'medium')
-        notes = request.POST.get('notes', '')
         
-        try:
-            product = Product.objects.get(id=product_id)
+        if need_id:  # Update existing need
+            need = get_object_or_404(Need, id=need_id, area=area)
+            form = NeedForm(request.POST, instance=need)
+        else:  # Create new need
+            form = NeedForm(request.POST)
             
-            if need_id:  # Update existing need
-                need = Need.objects.get(id=need_id, area=area)
-                need.product = product
-                need.quantity = int(quantity)
-                need.priority = priority
-                need.notes = notes
+        if form.is_valid():
+            try:
+                need = form.save(commit=False)
+                need.area = area  # Enforce area constraint
+                if not need_id:
+                    need.created_by = request.user
+                    need.status = 'pending'
                 need.save()
-                messages.success(request, f'Need updated successfully!')
-            else:  # Create new need
-                need = Need.objects.create(
-                    area=area,
-                    product=product,
-                    quantity=int(quantity),
-                    priority=priority,
-                    notes=notes,
-                    created_by=request.user,
-                    status='pending'
-                )
-                messages.success(request, f'New need for {product.name} added successfully!')
-            
-        except Product.DoesNotExist:
-            messages.error(request, 'Selected product not found')
-        except Need.DoesNotExist:
-            messages.error(request, 'Need not found')
-        except Exception as e:
-            messages.error(request, f'Error: {str(e)}')
+                
+                if need_id:
+                    messages.success(request, 'Need updated successfully!')
+                else:
+                    messages.success(request, f'New need for {need.product.name} added successfully!')
+            except Exception as e:
+                messages.error(request, f'Error: {str(e)}')
+        else:
+            errors = ", ".join([f"{k}: {v[0]}" for k, v in form.errors.items()])
+            messages.error(request, f'Validation error: {errors}')
         
-        # Redirect to prevent duplicate submissions
         return redirect('area_admin_needs')
     
     # Get needs for this area with enriched data
@@ -383,37 +366,32 @@ def super_admin_dashboard(request):
 
 @login_required
 def super_admin_areas(request):
-    """Manage areas"""
+    """Manage areas using AreaForm"""
     if request.user.user_type != 'super_admin':
         return redirect('login')
     
     # Handle POST request to create/update area
     if request.method == 'POST':
         area_id = request.POST.get('area_id')
-        name = request.POST.get('name')
-        description = request.POST.get('description')
-        address = request.POST.get('address')
-        pincode = request.POST.get('pincode')
         
-        try:
-            if area_id:  # Update existing
-                area = Area.objects.get(id=area_id)
-                area.name = name
-                area.description = description
-                area.address = address
-                area.pincode = pincode
-                area.save()
-                messages.success(request, f'Area "{name}" updated successfully!')
-            else:  # Create new
-                area = Area.objects.create(
-                    name=name,
-                    description=description,
-                    address=address,
-                    pincode=pincode
-                )
-                messages.success(request, f'Area "{name}" created successfully!')
-        except Exception as e:
-            messages.error(request, f'Error: {str(e)}')
+        if area_id:  # Update existing
+            area = get_object_or_404(Area, id=area_id)
+            form = AreaForm(request.POST, instance=area)
+        else:  # Create new
+            form = AreaForm(request.POST)
+            
+        if form.is_valid():
+            try:
+                area = form.save()
+                if area_id:
+                    messages.success(request, f'Area "{area.name}" updated successfully!')
+                else:
+                    messages.success(request, f'Area "{area.name}" created successfully!')
+            except Exception as e:
+                messages.error(request, f'Error: {str(e)}')
+        else:
+            errors = ", ".join([f"{k}: {v[0]}" for k, v in form.errors.items()])
+            messages.error(request, f'Validation error: {errors}')
         
         return redirect('super_admin_areas')
     
@@ -427,59 +405,34 @@ def super_admin_areas(request):
 
 @login_required
 def super_admin_area_admins(request):
-    """Manage area admins"""
+    """Manage area admins using AreaAdminForm"""
     if request.user.user_type != 'super_admin':
         return redirect('login')
     
     # Handle POST request to create/update area admin
     if request.method == 'POST':
         admin_id = request.POST.get('admin_id')
-        name = request.POST.get('name')
-        email = request.POST.get('email')
-        area_id = request.POST.get('area')
-        username = request.POST.get('username')
-        password = request.POST.get('password')
         
-        try:
-            area = Area.objects.get(id=area_id)
+        if admin_id:  # Update existing
+            area_admin = get_object_or_404(AreaAdmin, id=admin_id)
+            form = AreaAdminForm(request.POST, instance=area_admin)
+        else:  # Create new
+            form = AreaAdminForm(request.POST)
             
-            if admin_id:  # Update existing
-                area_admin = AreaAdmin.objects.get(id=admin_id)
-                area_admin.name = name
-                area_admin.email = email
-                area_admin.area = area
-                area_admin.save()
-                
-                # Update user if password provided
-                if password:
-                    user = area_admin.user
-                    user.set_password(password)
-                    user.save()
-                
-                messages.success(request, f'Shelter admin "{name}" updated successfully!')
-            else:  # Create new
-                user = User.objects.create_user(
-                    username=username,
-                    email=email,
-                    password=password,
-                    user_type='area_admin',
-                    first_name=name.split()[0] if ' ' in name else name,
-                    last_name=name.split()[-1] if ' ' in name and len(name.split()) > 1 else '',
-                    is_staff=True
-                )
-                
-                # Create area admin profile
-                area_admin = AreaAdmin.objects.create(
-                    user=user,
-                    name=name,
-                    email=email,
-                    area=area
-                )
-                
-                messages.success(request, f'Shelter admin "{name}" created successfully!')
+        if form.is_valid():
+            try:
+                area_admin = form.save()
+                if admin_id:
+                    messages.success(request, f'Shelter admin "{area_admin.name}" updated successfully!')
+                else:
+                    messages.success(request, f'Shelter admin "{area_admin.name}" created successfully!')
+            except Exception as e:
+                messages.error(request, f'Error: {str(e)}')
+        else:
+            errors = ", ".join([f"{k}: {v[0]}" for k, v in form.errors.items()])
+            messages.error(request, f'Validation error: {errors}')
             
-        except Exception as e:
-            messages.error(request, f'Error: {str(e)}')
+        return redirect('super_admin_area_admins')
     
     area_admins = AreaAdmin.objects.select_related('area', 'user').filter(is_active=True)
     areas = Area.objects.all()
@@ -501,38 +454,25 @@ def super_admin_area_admins(request):
 
 @login_required
 def super_admin_all_needs(request):
-    """View all needs across all areas with add functionality"""
+    """View all needs across all areas with NeedForm validation"""
     if request.user.user_type != 'super_admin':
         return redirect('login')
     
     # Handle POST request to create new need
     if request.method == 'POST':
-        area_id = request.POST.get('area_id')
-        product_id = request.POST.get('product_id')
-        quantity = request.POST.get('quantity')
-        priority = request.POST.get('priority', 'medium')
-        notes = request.POST.get('notes', '')
-        
-        try:
-            area = Area.objects.get(id=area_id)
-            product = Product.objects.get(id=product_id)
-            
-            need = Need.objects.create(
-                area=area,
-                product=product,
-                quantity=int(quantity),
-                priority=priority,
-                notes=notes,
-                created_by=request.user,
-                status='pending'
-            )
-            messages.success(request, f'Need for {product.name} in {area.name} added successfully!')
-        except Area.DoesNotExist:
-            messages.error(request, 'Selected area not found')
-        except Product.DoesNotExist:
-            messages.error(request, 'Selected product not found')
-        except Exception as e:
-            messages.error(request, f'Error: {str(e)}')
+        form = NeedForm(request.POST)
+        if form.is_valid():
+            try:
+                need = form.save(commit=False)
+                need.created_by = request.user
+                need.status = 'pending'
+                need.save()
+                messages.success(request, f'Need for {need.product.name} in {need.area.name} added successfully!')
+            except Exception as e:
+                messages.error(request, f'Error: {str(e)}')
+        else:
+            errors = ", ".join([f"{k}: {v[0]}" for k, v in form.errors.items()])
+            messages.error(request, f'Validation error: {errors}')
         
         return redirect('super_admin_all_needs')
     
@@ -559,33 +499,32 @@ def super_admin_all_needs(request):
 
 @login_required
 def super_admin_categories(request):
-    """Manage categories for super admin"""
+    """Manage categories for super admin using CategoryForm"""
     if request.user.user_type != 'super_admin':
         return redirect('login')
     
     # Handle POST request to create/update category
     if request.method == 'POST':
         category_id = request.POST.get('category_id')
-        name = request.POST.get('name')
-        description = request.POST.get('description', '')
         
-        try:
-            if category_id:  # Update existing
-                category = Category.objects.get(id=category_id)
-                category.name = name
-                category.description = description
-                category.save()
-                messages.success(request, f'Category "{name}" updated successfully!')
-            else:  # Create new
-                category = Category.objects.create(
-                    name=name,
-                    description=description
-                )
-                messages.success(request, f'Category "{name}" created successfully!')
-        except Category.DoesNotExist:
-            messages.error(request, 'Category not found')
-        except Exception as e:
-            messages.error(request, f'Error: {str(e)}')
+        if category_id:  # Update existing
+            category = get_object_or_404(Category, id=category_id)
+            form = CategoryForm(request.POST, instance=category)
+        else:  # Create new
+            form = CategoryForm(request.POST)
+            
+        if form.is_valid():
+            try:
+                category = form.save()
+                if category_id:
+                    messages.success(request, f'Category "{category.name}" updated successfully!')
+                else:
+                    messages.success(request, f'Category "{category.name}" created successfully!')
+            except Exception as e:
+                messages.error(request, f'Error: {str(e)}')
+        else:
+            errors = ", ".join([f"{k}: {v[0]}" for k, v in form.errors.items()])
+            messages.error(request, f'Validation error: {errors}')
         
         return redirect('super_admin_categories')
     
@@ -599,43 +538,32 @@ def super_admin_categories(request):
 
 @login_required
 def super_admin_products(request):
-    """Manage products for super admin"""
+    """Manage products for super admin using ProductForm"""
     if request.user.user_type != 'super_admin':
         return redirect('login')
     
     # Handle POST request to create/update product
     if request.method == 'POST':
         product_id = request.POST.get('product_id')
-        name = request.POST.get('name')
-        description = request.POST.get('description', '')
-        category_id = request.POST.get('category_id')
-        unit = request.POST.get('unit', '')
         
-        try:
-            category = Category.objects.get(id=category_id)
+        if product_id:  # Update existing
+            product = get_object_or_404(Product, id=product_id)
+            form = ProductForm(request.POST, instance=product)
+        else:  # Create new
+            form = ProductForm(request.POST)
             
-            if product_id:  # Update existing
-                product = Product.objects.get(id=product_id)
-                product.name = name
-                product.description = description
-                product.category = category
-                product.unit = unit
-                product.save()
-                messages.success(request, f'Product "{name}" updated successfully!')
-            else:  # Create new
-                product = Product.objects.create(
-                    name=name,
-                    description=description,
-                    category=category,
-                    unit=unit
-                )
-                messages.success(request, f'Product "{name}" created successfully!')
-        except Category.DoesNotExist:
-            messages.error(request, 'Selected category not found')
-        except Product.DoesNotExist:
-            messages.error(request, 'Product not found')
-        except Exception as e:
-            messages.error(request, f'Error: {str(e)}')
+        if form.is_valid():
+            try:
+                product = form.save()
+                if product_id:
+                    messages.success(request, f'Product "{product.name}" updated successfully!')
+                else:
+                    messages.success(request, f'Product "{product.name}" created successfully!')
+            except Exception as e:
+                messages.error(request, f'Error: {str(e)}')
+        else:
+            errors = ", ".join([f"{k}: {v[0]}" for k, v in form.errors.items()])
+            messages.error(request, f'Validation error: {errors}')
         
         return redirect('super_admin_products')
     
@@ -871,8 +799,6 @@ def export_needs(request, format):
         return response
     
     elif format == 'excel':
-        # For Excel, we'll use CSV format with .xls extension (simple approach)
-        # For proper Excel, you'd need openpyxl library
         response = HttpResponse(content_type='application/vnd.ms-excel')
         response['Content-Disposition'] = 'attachment; filename="relief_needs.xls"'
         
@@ -896,8 +822,6 @@ def export_needs(request, format):
         return response
     
     elif format == 'pdf':
-        # For PDF, we'll return a simple HTML that can be printed as PDF
-        # For proper PDF, you'd need reportlab or weasyprint library
         from django.template.loader import render_to_string
         
         context = {
@@ -978,7 +902,6 @@ def database_management(request):
     
     # Get database file info
     db_path = settings.DATABASES['default']['NAME']
-    # Convert Path object to string if needed
     if isinstance(db_path, Path):
         db_path = str(db_path)
     db_size = 0
@@ -999,42 +922,33 @@ def database_management(request):
 
 @login_required
 def export_database(request):
-    """Export database to SQL file"""
+    """Export database content as JSON using Django dumpdata (database-agnostic)"""
     if request.user.user_type != 'super_admin':
         messages.error(request, 'Access denied. Please login as Super Admin.')
         return redirect('login')
     
     try:
-        db_path = settings.DATABASES['default']['NAME']
-        # Convert Path object to string if needed
-        if isinstance(db_path, Path):
-            db_path = str(db_path)
+        import io
+        from django.core import management
         
-        if not os.path.exists(db_path):
-            messages.error(request, 'Database file not found!')
-            return redirect('database_management')
+        # Dump data to JSON format
+        out = io.StringIO()
+        management.call_command('dumpdata', indent=2, stdout=out)
         
-        # Create backup file with timestamp
+        # Create HTTP response
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        backup_filename = f'backup_{timestamp}.sql'
-        backup_path = BASE_DIR / backup_filename
+        backup_filename = f'database_backup_{timestamp}.json'
         
-        # Connect and dump
-        conn = sqlite3.connect(db_path)
-        with open(backup_path, 'w', encoding='utf-8') as f:
-            for line in conn.iterdump():
-                f.write('%s\n' % line)
-        conn.close()
+        response = HttpResponse(out.getvalue(), content_type='application/json')
+        response['Content-Disposition'] = f'attachment; filename="{backup_filename}"'
         
-        # Create HTTP response with file
-        with open(backup_path, 'rb') as f:
-            response = HttpResponse(f.read(), content_type='application/sql')
-            response['Content-Disposition'] = f'attachment; filename="{backup_filename}"'
-        
-        # Optionally delete the file after sending (or keep it)
-        # os.remove(backup_path)
-        
-        messages.success(request, f'Database exported successfully! File: {backup_filename}')
+        # Save a copy locally on server
+        backup_dir = BASE_DIR / 'backups'
+        backup_dir.mkdir(exist_ok=True)
+        with open(backup_dir / backup_filename, 'w', encoding='utf-8') as f:
+            f.write(out.getvalue())
+            
+        messages.success(request, f'Database exported successfully as {backup_filename}')
         return response
         
     except Exception as e:
@@ -1044,7 +958,7 @@ def export_database(request):
 
 @login_required
 def import_database(request):
-    """Import database from SQL file"""
+    """Import database from uploaded JSON (agnostic) or SQLite script file"""
     if request.user.user_type != 'super_admin':
         messages.error(request, 'Access denied. Please login as Super Admin.')
         return redirect('login')
@@ -1054,50 +968,56 @@ def import_database(request):
         return redirect('database_management')
     
     try:
-        # Check if file was uploaded
         if 'sql_file' not in request.FILES:
             messages.error(request, 'No file uploaded!')
             return redirect('database_management')
         
         uploaded_file = request.FILES['sql_file']
         
-        # Validate file extension
-        if not uploaded_file.name.endswith('.sql'):
-            messages.error(request, 'Invalid file format! Please upload a .sql file.')
+        # Accept JSON backups or SQLite raw SQL dumps
+        if not (uploaded_file.name.endswith('.json') or uploaded_file.name.endswith('.sql')):
+            messages.error(request, 'Invalid file format! Please upload a .json or .sql file.')
             return redirect('database_management')
+            
+        # Create temp path
+        temp_dir = BASE_DIR / 'backups' / 'temp'
+        temp_dir.mkdir(parents=True, exist_ok=True)
+        temp_file_path = temp_dir / uploaded_file.name
         
-        # Read file content
-        file_content = uploaded_file.read().decode('utf-8')
-        
-        # Get database path
-        db_path = settings.DATABASES['default']['NAME']
-        # Convert Path object to string if needed
-        if isinstance(db_path, Path):
-            db_path = str(db_path)
-        
-        # Create backup before import (safety measure)
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        safety_backup = f'safety_backup_{timestamp}.sql'
-        safety_backup_path = BASE_DIR / safety_backup
-        
-        if os.path.exists(db_path):
-            conn_backup = sqlite3.connect(db_path)
-            with open(safety_backup_path, 'w', encoding='utf-8') as f:
-                for line in conn_backup.iterdump():
-                    f.write('%s\n' % line)
-            conn_backup.close()
-        
-        # Connect to database and execute SQL
-        conn = sqlite3.connect(db_path)
-        conn.executescript(file_content)
-        conn.close()
-        
-        messages.success(request, f'Database imported successfully! A safety backup was created: {safety_backup}')
+        # Save file locally
+        with open(temp_file_path, 'wb+') as temp_file:
+            for chunk in uploaded_file.chunks():
+                temp_file.write(chunk)
+                
+        # Handle SQLite raw SQL import
+        if uploaded_file.name.endswith('.sql'):
+            db_engine = settings.DATABASES['default']['ENGINE']
+            if 'sqlite' in db_engine:
+                db_path = settings.DATABASES['default']['NAME']
+                if isinstance(db_path, Path):
+                    db_path = str(db_path)
+                
+                with open(temp_file_path, 'r', encoding='utf-8') as f:
+                    file_content = f.read()
+                
+                conn = sqlite3.connect(db_path)
+                conn.executescript(file_content)
+                conn.close()
+                messages.success(request, 'SQLite SQL file imported successfully!')
+            else:
+                messages.error(request, 'SQL imports are only supported for SQLite databases. Use JSON format for other engines.')
+        else:
+            # Django deserialization (JSON format - database agnostic)
+            from django.core import management
+            management.call_command('loaddata', str(temp_file_path))
+            messages.success(request, 'JSON Database backup imported successfully!')
+            
+        # Delete temp file
+        if os.path.exists(temp_file_path):
+            os.remove(temp_file_path)
+            
         return redirect('database_management')
         
-    except sqlite3.Error as e:
-        messages.error(request, f'Database error: {str(e)}')
-        return redirect('database_management')
     except Exception as e:
         messages.error(request, f'Error importing database: {str(e)}')
         return redirect('database_management')
