@@ -10,9 +10,42 @@
     <p class="text-muted">Create and manage geographical regions</p>
 </div>
 
+<!-- Filter & Search Bar -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET" action="{% url 'super_admin_areas' %}" class="row g-3 align-items-end">
+            <div class="col-md-5">
+                <label class="form-label">Search Regions</label>
+                <input type="text" name="search" class="form-control" placeholder="Search by name, address or zip code..." value="{{ search_query }}">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Sort By</label>
+                <select name="sort" class="form-select">
+                    <option value="name" {% if sort_by == "name" %}selected{% endif %}>Name (A-Z)</option>
+                    <option value="-name" {% if sort_by == "-name" %}selected{% endif %}>Name (Z-A)</option>
+                    <option value="pincode" {% if sort_by == "pincode" %}selected{% endif %}>Zip Code (Asc)</option>
+                    <option value="-pincode" {% if sort_by == "-pincode" %}selected{% endif %}>Zip Code (Desc)</option>
+                    <option value="-needs_count" {% if sort_by == "-needs_count" %}selected{% endif %}>Most Needs</option>
+                    <option value="needs_count" {% if sort_by == "needs_count" %}selected{% endif %}>Least Needs</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-filter me-2"></i>Apply
+                </button>
+            </div>
+            <div class="col-md-1">
+                <a href="{% url 'super_admin_areas' %}" class="btn btn-outline-secondary w-100" title="Clear Filters">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
 <div class="card mb-4">
     <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-        <h5 class="mb-0"><i class="fas fa-table me-2"></i>All Regions</h5>
+        <h5 class="mb-0"><i class="fas fa-table me-2"></i>All Regions <span class="badge bg-light text-dark ms-2">{{ areas|length }}</span></h5>
         <button class="btn btn-light btn-sm" onclick="openAddAreaModal()">
             <i class="fas fa-plus me-2"></i>Add New Region
         </button>
@@ -22,12 +55,25 @@
             <table class="table table-hover mb-0">
                 <thead>
                     <tr>
-                <th>ID</th>
-                <th>Region Name</th>
-                <th>Description</th>
-                <th>Address</th>
-                <th>Zip Code</th>
-                <th>Actions</th>
+                        <th>ID</th>
+                        <th>
+                            <a href="?sort={% if sort_by == 'name' %}-name{% else %}name{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="text-decoration-none text-dark">
+                                Region Name <i class="fas fa-sort ms-1 text-muted"></i>
+                            </a>
+                        </th>
+                        <th>Description</th>
+                        <th>Address</th>
+                        <th>
+                            <a href="?sort={% if sort_by == 'pincode' %}-pincode{% else %}pincode{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="text-decoration-none text-dark">
+                                Zip Code <i class="fas fa-sort ms-1 text-muted"></i>
+                            </a>
+                        </th>
+                        <th>
+                            <a href="?sort={% if sort_by == '-needs_count' %}needs_count{% else %}-needs_count{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="text-decoration-none text-dark">
+                                Needs <i class="fas fa-sort ms-1 text-muted"></i>
+                            </a>
+                        </th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -41,8 +87,9 @@
                             <td>{{ area.description }}</td>
                             <td>{{ area.address }}</td>
                             <td><span class="badge bg-secondary">{{ area.pincode }}</span></td>
+                            <td><span class="badge bg-info">{{ area.needs_count }}</span></td>
                             <td>
-                                <button class="btn btn-sm btn-outline-primary" onclick="editArea({{ area.id }}, '{{ area.name }}', '{{ area.description }}', '{{ area.address }}', '{{ area.pincode }}')">
+                                <button class="btn btn-sm btn-outline-primary" onclick="editArea({{ area.id }}, '{{ area.name|escapejs }}', '{{ area.description|escapejs }}', '{{ area.address|escapejs }}', '{{ area.pincode }}')">
                                     <i class="fas fa-edit"></i> Edit
                                 </button>
                                 <button class="btn btn-sm btn-outline-danger" onclick="deleteArea({{ area.id }}, '{{ area.name|escapejs }}')">
@@ -52,7 +99,7 @@
                         </tr>
                     {% empty %}
                         <tr>
-                            <td colspan="6" class="text-center py-4 text-muted">
+                            <td colspan="7" class="text-center py-4 text-muted">
                                 No regions created yet. Click "Add New Region" to get started.
                             </td>
                         </tr>
@@ -170,4 +217,3 @@ function deleteArea(areaId, areaName) {
 }
 </script>
 {% endblock %}
-

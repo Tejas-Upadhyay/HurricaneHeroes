@@ -11,7 +11,7 @@
         <p class="text-muted mb-0">Complete overview of all relief needs across all areas</p>
     </div>
     <div>
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addNeedModal">
+        <button type="button" class="btn btn-primary" onclick="openAddNeedModal()">
             <i class="fas fa-plus-circle me-2"></i>Add New Need
         </button>
     </div>
@@ -20,26 +20,64 @@
 <!-- Filter Section -->
 <div class="card mb-4">
     <div class="card-body">
-        <div class="row g-3">
-            <div class="col-md-4">
+        <form method="GET" action="{% url 'super_admin_all_needs' %}" class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label">Search Item</label>
+                <input type="text" name="search" class="form-control" placeholder="Search by item name..." value="{{ search_query }}">
+            </div>
+            <div class="col-md-2">
                 <label class="form-label">Filter by Area</label>
-                <select class="form-select">
+                <select name="area" class="form-select">
                     <option value="">All Areas</option>
-                    <option value="1">Mumbai District</option>
-                    <option value="2">Pune District</option>
-                    <option value="3">Delhi District</option>
+                    {% for area in areas %}
+                        <option value="{{ area.id }}" {% if area_filter == area.id|stringformat:"s" %}selected{% endif %}>{{ area.name }}</option>
+                    {% endfor %}
                 </select>
             </div>
-            <div class="col-md-4">
-                <label class="form-label">Search Item to Donate</label>
-                <input type="text" class="form-control" placeholder="Search by item name...">
+            <div class="col-md-2">
+                <label class="form-label">Filter by Category</label>
+                <select name="category" class="form-select">
+                    <option value="">All Categories</option>
+                    {% for cat in categories %}
+                        <option value="{{ cat.id }}" {% if category_filter == cat.id|stringformat:"s" %}selected{% endif %}>{{ cat.name }}</option>
+                    {% endfor %}
+                </select>
             </div>
-            <div class="col-md-4 d-flex align-items-end">
-                <button class="btn btn-primary w-100">
-                    <i class="fas fa-filter me-2"></i>Apply Filters
-                </button>
+            <div class="col-md-2">
+                <label class="form-label">Priority</label>
+                <select name="priority" class="form-select">
+                    <option value="">All Priorities</option>
+                    <option value="urgent" {% if priority_filter == "urgent" %}selected{% endif %}>Urgent</option>
+                    <option value="high" {% if priority_filter == "high" %}selected{% endif %}>High</option>
+                    <option value="medium" {% if priority_filter == "medium" %}selected{% endif %}>Medium</option>
+                    <option value="low" {% if priority_filter == "low" %}selected{% endif %}>Low</option>
+                </select>
             </div>
+            <div class="col-md-2">
+                <label class="form-label">Sort By</label>
+                <select name="sort" class="form-select">
+                    <option value="-created_at" {% if sort_by == "-created_at" %}selected{% endif %}>Newest First</option>
+                    <option value="created_at" {% if sort_by == "created_at" %}selected{% endif %}>Oldest First</option>
+                    <option value="product__name" {% if sort_by == "product__name" %}selected{% endif %}>Item (A-Z)</option>
+                    <option value="-product__name" {% if sort_by == "-product__name" %}selected{% endif %}>Item (Z-A)</option>
+                    <option value="area__name" {% if sort_by == "area__name" %}selected{% endif %}>Area (A-Z)</option>
+                    <option value="-area__name" {% if sort_by == "-area__name" %}selected{% endif %}>Area (Z-A)</option>
+                    <option value="-quantity" {% if sort_by == "-quantity" %}selected{% endif %}>Quantity (High-Low)</option>
+                    <option value="quantity" {% if sort_by == "quantity" %}selected{% endif %}>Quantity (Low-High)</option>
+                </select>
+            </div>
+            <div class="col-md-1">
+                <button type="submit" class="btn btn-primary w-100"><i class="fas fa-filter"></i></button>
+            </div>
+        </form>
+        {% if search_query or area_filter or category_filter or priority_filter %}
+        <div class="mt-2">
+            <a href="{% url 'super_admin_all_needs' %}" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-times me-1"></i>Clear Filters
+            </a>
+            <small class="text-muted ms-2">Showing {{ needs|length }} result(s)</small>
         </div>
+        {% endif %}
     </div>
 </div>
 
@@ -47,7 +85,7 @@
 <div class="card">
     <div class="card-header bg-primary text-white">
         <h5 class="mb-0">
-            <i class="fas fa-table me-2"></i>Needs Summary ({{ needs|length }} total)
+            <i class="fas fa-table me-2"></i>Needs Summary <span class="badge bg-light text-dark ms-2">{{ needs|length }} total</span>
         </h5>
     </div>
     <div class="card-body p-0">
@@ -56,11 +94,23 @@
                 <thead>
                     <tr>
                         <th>Need ID</th>
-                        <th>Region</th>
-                        <th>Items to Donate</th>
+                        <th>
+                            <a href="?sort={% if sort_by == 'area__name' %}-area__name{% else %}area__name{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}{% if area_filter %}&area={{ area_filter }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if priority_filter %}&priority={{ priority_filter }}{% endif %}" class="text-decoration-none text-dark">
+                                Region <i class="fas fa-sort ms-1 text-muted"></i>
+                            </a>
+                        </th>
+                        <th>
+                            <a href="?sort={% if sort_by == 'product__name' %}-product__name{% else %}product__name{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}{% if area_filter %}&area={{ area_filter }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if priority_filter %}&priority={{ priority_filter }}{% endif %}" class="text-decoration-none text-dark">
+                                Items to Donate <i class="fas fa-sort ms-1 text-muted"></i>
+                            </a>
+                        </th>
                         <th>Category</th>
                         <th>Unit</th>
-                        <th>Quantity</th>
+                        <th>
+                            <a href="?sort={% if sort_by == '-quantity' %}quantity{% else %}-quantity{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}{% if area_filter %}&area={{ area_filter }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if priority_filter %}&priority={{ priority_filter }}{% endif %}" class="text-decoration-none text-dark">
+                                Quantity <i class="fas fa-sort ms-1 text-muted"></i>
+                            </a>
+                        </th>
                         <th>Notes</th>
                         <th>Actions</th>
                     </tr>
@@ -95,10 +145,24 @@
                                 {% endif %}
                             </td>
                             <td>
-                                <a href="{% url 'view_need_detail' item.need.id %}" class="btn btn-sm btn-outline-primary" title="View Details">
+                                <button class="btn btn-sm btn-outline-primary me-1 btn-edit-need"
+                                        data-need-id="{{ item.need.id }}"
+                                        data-area-id="{{ item.area.id }}"
+                                        data-product-id="{{ item.product.id }}"
+                                        data-quantity="{{ item.need.quantity }}"
+                                        data-priority="{{ item.need.priority }}"
+                                        data-notes="{{ item.need.notes|default:''|escapejs }}"
+                                        title="Edit">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <a href="{% url 'view_need_detail' item.need.id %}" class="btn btn-sm btn-outline-info me-1" title="View Details">
                                     <i class="fas fa-eye"></i>
                                 </a>
-                                <button class="btn btn-sm btn-outline-danger" onclick="deleteNeed({{ item.need.id }}, '{{ item.product.name|escapejs }}', '{{ item.area.name|escapejs }}')" title="Delete">
+                                <button class="btn btn-sm btn-outline-danger btn-delete-need"
+                                        data-need-id="{{ item.need.id }}"
+                                        data-product-name="{{ item.product.name|escapejs }}"
+                                        data-area-name="{{ item.area.name|escapejs }}"
+                                        title="Delete">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </td>
@@ -117,18 +181,19 @@
     </div>
 </div>
 
-<!-- Add Need Modal -->
-<div class="modal fade" id="addNeedModal" tabindex="-1" aria-labelledby="addNeedModalLabel" aria-hidden="true">
+<!-- Add / Edit Need Modal -->
+<div class="modal fade" id="needModal" tabindex="-1" aria-labelledby="needModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title" id="addNeedModalLabel">
+                <h5 class="modal-title" id="needModalLabel">
                     <i class="fas fa-plus-circle me-2"></i>Add New Relief Need
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form method="POST" action="{% url 'super_admin_all_needs' %}">
                 {% csrf_token %}
+                <input type="hidden" id="need_id" name="need_id" value="">
                 <div class="modal-body">
                     <div class="row g-3">
                         <div class="col-md-6">
@@ -170,7 +235,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">
+                    <button type="submit" class="btn btn-primary" id="needSubmitBtn">
                         <i class="fas fa-save me-2"></i>Add Need
                     </button>
                 </div>
@@ -211,32 +276,65 @@ function getCookie(name) {
     return cookieValue;
 }
 
-function deleteNeed(needId, productName, areaName) {
-    if (confirm(`Are you sure you want to delete the need for "${productName}" in "${areaName}"?`)) {
-        const csrftoken = getCookie('csrftoken');
-        fetch(`/super-admin/need/${needId}/delete/`, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': csrftoken,
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-            },
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
-            } else {
-                alert('Error: ' + data.message);
-            }
-        })
+function openAddNeedModal() {
+    document.getElementById('needModalLabel').innerHTML = '<i class="fas fa-plus-circle me-2"></i>Add New Relief Need';
+    document.getElementById('need_id').value = '';
+    document.getElementById('area_id').value = '';
+    document.getElementById('product_id').value = '';
+    document.getElementById('quantity').value = '';
+    document.getElementById('priority').value = 'medium';
+    document.getElementById('notes').value = '';
+    document.getElementById('needSubmitBtn').innerHTML = '<i class="fas fa-save me-2"></i>Add Need';
+    var modal = new bootstrap.Modal(document.getElementById('needModal'));
+    modal.show();
+}
+
+// Event delegation for Edit buttons (reads from data-* attributes, no inline JS args)
+document.addEventListener('click', function(e) {
+    const editBtn = e.target.closest('.btn-edit-need');
+    if (editBtn) {
+        const d = editBtn.dataset;
+        document.getElementById('needModalLabel').innerHTML = '<i class="fas fa-edit me-2"></i>Edit Relief Need';
+        document.getElementById('need_id').value    = d.needId;
+        document.getElementById('area_id').value    = d.areaId;
+        document.getElementById('product_id').value = d.productId;
+        document.getElementById('quantity').value   = d.quantity;
+        document.getElementById('priority').value   = d.priority;
+        document.getElementById('notes').value      = d.notes;
+        document.getElementById('needSubmitBtn').innerHTML = '<i class="fas fa-save me-2"></i>Update Need';
+        var modal = new bootstrap.Modal(document.getElementById('needModal'));
+        modal.show();
+    }
+
+    const delBtn = e.target.closest('.btn-delete-need');
+    if (delBtn) {
+        const needId      = delBtn.dataset.needId;
+        const productName = delBtn.dataset.productName;
+        const areaName    = delBtn.dataset.areaName;
+        if (confirm('Are you sure you want to delete the need for "' + productName + '" in "' + areaName + '"?')) {
+            const csrftoken = getCookie('csrftoken');
+            fetch('/super-admin/need/' + needId + '/delete/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
         .catch(error => {
             console.error('Error:', error);
             alert('An error occurred while deleting the need.');
         });
+        }
     }
-}
+});
 </script>
 {% endblock %}
-
-

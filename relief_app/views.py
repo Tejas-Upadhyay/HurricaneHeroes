@@ -258,7 +258,7 @@ def area_admin_dashboard(request):
 
 @login_required
 def area_admin_needs(request):
-    """Manage needs for area admin"""
+    """Manage needs for area admin with filter and sort support"""
     if request.user.user_type != 'area_admin':
         messages.error(request, 'Access denied')
         return redirect('login')
@@ -312,9 +312,31 @@ def area_admin_needs(request):
         # Redirect to prevent duplicate submissions
         return redirect('area_admin_needs')
     
-    # Get needs for this area with enriched data
+    # Get filter/sort parameters from GET
+    search_query = request.GET.get('search', '')
+    category_filter = request.GET.get('category', '')
+    priority_filter = request.GET.get('priority', '')
+    sort_by = request.GET.get('sort', '-created_at')
+
+    # Base queryset
     area_needs = Need.objects.filter(area=area).select_related('product', 'product__category')
-    
+
+    # Apply filters
+    if search_query:
+        area_needs = area_needs.filter(product__name__icontains=search_query)
+    if category_filter:
+        area_needs = area_needs.filter(product__category_id=category_filter)
+    if priority_filter:
+        area_needs = area_needs.filter(priority=priority_filter)
+
+    # Apply sorting
+    valid_sorts = ['product__name', '-product__name', 'quantity', '-quantity',
+                   'priority', '-priority', 'created_at', '-created_at']
+    if sort_by in valid_sorts:
+        area_needs = area_needs.order_by(sort_by)
+    else:
+        area_needs = area_needs.order_by('-created_at')
+
     # Enrich needs for template
     enriched_needs = []
     for need in area_needs:
@@ -328,6 +350,11 @@ def area_admin_needs(request):
         'needs': enriched_needs,
         'products': Product.objects.select_related('category'),
         'areas': [area],
+        'categories': Category.objects.all().order_by('name'),
+        'search_query': search_query,
+        'category_filter': category_filter,
+        'priority_filter': priority_filter,
+        'sort_by': sort_by,
     }
     return render(request, 'area_admin/needs.html', context)
 
@@ -346,15 +373,34 @@ def area_admin_categories(request):
 
 @login_required
 def area_admin_products(request):
-    """View products"""
+    """View products with filter and sort support"""
     if request.user.user_type != 'area_admin':
         return redirect('login')
-    
+
+    # Filter & sort params
+    search_query = request.GET.get('search', '')
+    category_filter = request.GET.get('category', '')
+    sort_by = request.GET.get('sort', 'name')
+
     products = Product.objects.select_related('category')
+
+    if search_query:
+        products = products.filter(name__icontains=search_query)
+    if category_filter:
+        products = products.filter(category_id=category_filter)
+
+    valid_sorts = ['name', '-name', 'category__name', '-category__name', 'unit', '-unit']
+    if sort_by in valid_sorts:
+        products = products.order_by(sort_by)
+    else:
+        products = products.order_by('name')
     
     context = {
         'products': products,
-        'categories': Category.objects.all(),
+        'categories': Category.objects.all().order_by('name'),
+        'search_query': search_query,
+        'category_filter': category_filter,
+        'sort_by': sort_by,
     }
     return render(request, 'area_admin/products.html', context)
 
@@ -383,7 +429,7 @@ def super_admin_dashboard(request):
 
 @login_required
 def super_admin_areas(request):
-    """Manage areas"""
+    """Manage areas with filter and sort support"""
     if request.user.user_type != 'super_admin':
         return redirect('login')
     
@@ -417,17 +463,36 @@ def super_admin_areas(request):
         
         return redirect('super_admin_areas')
     
-    areas = Area.objects.annotate(needs_count=Count('needs')).order_by('name')
+    # Filter & sort params
+    search_query = request.GET.get('search', '')
+    sort_by = request.GET.get('sort', 'name')
+
+    areas = Area.objects.annotate(needs_count=Count('needs'))
+
+    if search_query:
+        areas = areas.filter(
+            Q(name__icontains=search_query) |
+            Q(address__icontains=search_query) |
+            Q(pincode__icontains=search_query)
+        )
+
+    valid_sorts = ['name', '-name', 'pincode', '-pincode', 'needs_count', '-needs_count']
+    if sort_by in valid_sorts:
+        areas = areas.order_by(sort_by)
+    else:
+        areas = areas.order_by('name')
     
     context = {
         'areas': areas,
+        'search_query': search_query,
+        'sort_by': sort_by,
     }
     return render(request, 'super_admin/areas.html', context)
 
 
 @login_required
 def super_admin_area_admins(request):
-    """Manage area admins"""
+    """Manage area admins with filter and sort support"""
     if request.user.user_type != 'super_admin':
         return redirect('login')
     
@@ -481,12 +546,31 @@ def super_admin_area_admins(request):
         except Exception as e:
             messages.error(request, f'Error: {str(e)}')
     
-    area_admins = AreaAdmin.objects.select_related('area', 'user').filter(is_active=True)
+    # Filter & sort params
+    search_query = request.GET.get('search', '')
+    area_filter = request.GET.get('area', '')
+    sort_by = request.GET.get('sort', 'name')
+
+    area_admins_qs = AreaAdmin.objects.select_related('area', 'user').filter(is_active=True)
+
+    if search_query:
+        area_admins_qs = area_admins_qs.filter(
+            Q(name__icontains=search_query) | Q(email__icontains=search_query)
+        )
+    if area_filter:
+        area_admins_qs = area_admins_qs.filter(area_id=area_filter)
+
+    valid_sorts = ['name', '-name', 'email', '-email', 'area__name', '-area__name']
+    if sort_by in valid_sorts:
+        area_admins_qs = area_admins_qs.order_by(sort_by)
+    else:
+        area_admins_qs = area_admins_qs.order_by('name')
+
     areas = Area.objects.all()
     
     # Convert to template-friendly format
     admins_list = []
-    for admin in area_admins:
+    for admin in area_admins_qs:
         admins_list.append({
             'admin': admin,
             'area': admin.area,
@@ -495,18 +579,22 @@ def super_admin_area_admins(request):
     context = {
         'admins': admins_list,
         'areas': areas,
+        'search_query': search_query,
+        'area_filter': area_filter,
+        'sort_by': sort_by,
     }
     return render(request, 'super_admin/area_admins.html', context)
 
 
 @login_required
 def super_admin_all_needs(request):
-    """View all needs across all areas with add functionality"""
+    """View all needs across all areas with add/edit functionality and filter/sort support"""
     if request.user.user_type != 'super_admin':
         return redirect('login')
     
-    # Handle POST request to create new need
+    # Handle POST request to create or update a need
     if request.method == 'POST':
+        need_id = request.POST.get('need_id')
         area_id = request.POST.get('area_id')
         product_id = request.POST.get('product_id')
         quantity = request.POST.get('quantity')
@@ -516,27 +604,63 @@ def super_admin_all_needs(request):
         try:
             area = Area.objects.get(id=area_id)
             product = Product.objects.get(id=product_id)
-            
-            need = Need.objects.create(
-                area=area,
-                product=product,
-                quantity=int(quantity),
-                priority=priority,
-                notes=notes,
-                created_by=request.user,
-                status='pending'
-            )
-            messages.success(request, f'Need for {product.name} in {area.name} added successfully!')
+
+            if need_id:  # Edit existing need
+                need = Need.objects.get(id=need_id)
+                need.area = area
+                need.product = product
+                need.quantity = int(quantity)
+                need.priority = priority
+                need.notes = notes
+                need.save()
+                messages.success(request, f'Need updated successfully!')
+            else:  # Create new need
+                need = Need.objects.create(
+                    area=area,
+                    product=product,
+                    quantity=int(quantity),
+                    priority=priority,
+                    notes=notes,
+                    created_by=request.user,
+                    status='pending'
+                )
+                messages.success(request, f'Need for {product.name} in {area.name} added successfully!')
         except Area.DoesNotExist:
             messages.error(request, 'Selected area not found')
         except Product.DoesNotExist:
             messages.error(request, 'Selected product not found')
+        except Need.DoesNotExist:
+            messages.error(request, 'Need not found')
         except Exception as e:
             messages.error(request, f'Error: {str(e)}')
         
         return redirect('super_admin_all_needs')
     
-    all_needs = Need.objects.select_related('product', 'area', 'product__category').order_by('-created_at')
+    # Filter & sort params
+    search_query = request.GET.get('search', '')
+    area_filter = request.GET.get('area', '')
+    category_filter = request.GET.get('category', '')
+    priority_filter = request.GET.get('priority', '')
+    sort_by = request.GET.get('sort', '-created_at')
+
+    all_needs = Need.objects.select_related('product', 'area', 'product__category')
+
+    if search_query:
+        all_needs = all_needs.filter(product__name__icontains=search_query)
+    if area_filter:
+        all_needs = all_needs.filter(area_id=area_filter)
+    if category_filter:
+        all_needs = all_needs.filter(product__category_id=category_filter)
+    if priority_filter:
+        all_needs = all_needs.filter(priority=priority_filter)
+
+    valid_sorts = ['product__name', '-product__name', 'area__name', '-area__name',
+                   'quantity', '-quantity', 'priority', '-priority',
+                   'created_at', '-created_at']
+    if sort_by in valid_sorts:
+        all_needs = all_needs.order_by(sort_by)
+    else:
+        all_needs = all_needs.order_by('-created_at')
     
     # Enrich needs for template
     enriched_needs = []
@@ -550,9 +674,14 @@ def super_admin_all_needs(request):
     
     context = {
         'needs': enriched_needs,
-        'areas': Area.objects.all(),
-        'products': Product.objects.select_related('category'),
-        'categories': Category.objects.all(),
+        'areas': Area.objects.all().order_by('name'),
+        'products': Product.objects.select_related('category').order_by('name'),
+        'categories': Category.objects.all().order_by('name'),
+        'search_query': search_query,
+        'area_filter': area_filter,
+        'category_filter': category_filter,
+        'priority_filter': priority_filter,
+        'sort_by': sort_by,
     }
     return render(request, 'super_admin/all_needs.html', context)
 
@@ -599,7 +728,7 @@ def super_admin_categories(request):
 
 @login_required
 def super_admin_products(request):
-    """Manage products for super admin"""
+    """Manage products for super admin with filter and sort support"""
     if request.user.user_type != 'super_admin':
         return redirect('login')
     
@@ -639,12 +768,34 @@ def super_admin_products(request):
         
         return redirect('super_admin_products')
     
-    products = Product.objects.select_related('category').all().order_by('name')
+    # Filter & sort params
+    search_query = request.GET.get('search', '')
+    category_filter = request.GET.get('category', '')
+    sort_by = request.GET.get('sort', 'name')
+
+    products = Product.objects.select_related('category')
+
+    if search_query:
+        products = products.filter(
+            Q(name__icontains=search_query) | Q(description__icontains=search_query)
+        )
+    if category_filter:
+        products = products.filter(category_id=category_filter)
+
+    valid_sorts = ['name', '-name', 'category__name', '-category__name', 'unit', '-unit']
+    if sort_by in valid_sorts:
+        products = products.order_by(sort_by)
+    else:
+        products = products.order_by('name')
+
     categories = Category.objects.all().order_by('name')
     
     context = {
         'products': products,
         'categories': categories,
+        'search_query': search_query,
+        'category_filter': category_filter,
+        'sort_by': sort_by,
     }
     return render(request, 'super_admin/products.html', context)
 
@@ -675,6 +826,56 @@ def delete_product(request, product_id):
             return JsonResponse({'success': False, 'message': str(e)}, status=500)
         messages.error(request, f'Error: {str(e)}')
         return redirect('super_admin_products')
+
+
+@login_required
+@require_http_methods(["POST"])
+def delete_need_area_admin(request, need_id):
+    """Delete a need (area admin only, restricted to own area)"""
+    if request.user.user_type != 'area_admin':
+        return JsonResponse({'success': False, 'message': 'Access denied'}, status=403)
+    
+    try:
+        area_admin_profile = AreaAdmin.objects.get(user=request.user)
+        area = area_admin_profile.area
+    except AreaAdmin.DoesNotExist:
+        return JsonResponse({'success': False, 'message': 'Area admin profile not found'}, status=400)
+    
+    try:
+        need = get_object_or_404(Need, id=need_id, area=area)
+        product_name = need.product.name
+        need.delete()
+        return JsonResponse({'success': True, 'message': f'Need for "{product_name}" deleted successfully'})
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': str(e)}, status=500)
+
+
+@login_required
+@require_http_methods(["POST"])
+def delete_need(request, need_id):
+    """Delete a need (super admin)"""
+    if request.user.user_type != 'super_admin':
+        if request.headers.get('Accept') == 'application/json':
+            return JsonResponse({'success': False, 'message': 'Access denied'}, status=403)
+        messages.error(request, 'Access denied')
+        return redirect('super_admin_all_needs')
+    
+    try:
+        need = get_object_or_404(Need, id=need_id)
+        product_name = need.product.name
+        area_name = need.area.name
+        need.delete()
+        messages.success(request, f'Need for {product_name} in {area_name} deleted successfully!')
+        
+        if request.headers.get('Content-Type') == 'application/json' or request.headers.get('Accept') == 'application/json':
+            return JsonResponse({'success': True, 'message': 'Need deleted successfully'})
+        
+        return redirect('super_admin_all_needs')
+    except Exception as e:
+        if request.headers.get('Content-Type') == 'application/json' or request.headers.get('Accept') == 'application/json':
+            return JsonResponse({'success': False, 'message': str(e)}, status=500)
+        messages.error(request, f'Error: {str(e)}')
+        return redirect('super_admin_all_needs')
 
 
 @login_required
@@ -808,34 +1009,6 @@ def delete_contact(request, contact_id):
         messages.error(request, f'Error: {str(e)}')
         return redirect('super_admin_contacts')
 
-
-@login_required
-@require_http_methods(["POST"])
-def delete_need(request, need_id):
-    """Delete a need"""
-    if request.user.user_type != 'super_admin':
-        if request.headers.get('Content-Type') == 'application/json':
-            return JsonResponse({'success': False, 'message': 'Access denied'}, status=403)
-        messages.error(request, 'Access denied')
-        return redirect('super_admin_all_needs')
-    
-    try:
-        need = get_object_or_404(Need, id=need_id)
-        product_name = need.product.name
-        area_name = need.area.name
-        need.delete()
-        messages.success(request, f'Need for {product_name} in {area_name} deleted successfully!')
-        
-        # Return JSON response for AJAX requests
-        if request.headers.get('Content-Type') == 'application/json' or request.headers.get('Accept') == 'application/json':
-            return JsonResponse({'success': True, 'message': 'Need deleted successfully'})
-        
-        return redirect('super_admin_all_needs')
-    except Exception as e:
-        if request.headers.get('Content-Type') == 'application/json' or request.headers.get('Accept') == 'application/json':
-            return JsonResponse({'success': False, 'message': str(e)}, status=500)
-        messages.error(request, f'Error: {str(e)}')
-        return redirect('super_admin_all_needs')
 
 
 @login_required

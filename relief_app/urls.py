@@ -22,6 +22,7 @@ urlpatterns = [
     path('area-admin/needs/', views.area_admin_needs, name='area_admin_needs'),
     path('area-admin/categories/', views.area_admin_categories, name='area_admin_categories'),
     path('area-admin/products/', views.area_admin_products, name='area_admin_products'),
+    path('area-admin/need/<int:need_id>/delete/', views.delete_need_area_admin, name='delete_need_area_admin'),
     
     # Super Admin Panel
     path('super-admin/dashboard/', views.super_admin_dashboard, name='super_admin_dashboard'),

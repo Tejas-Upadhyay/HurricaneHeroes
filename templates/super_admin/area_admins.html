@@ -10,9 +10,47 @@
     <p class="text-muted">Create and manage shelter administrator accounts</p>
 </div>
 
+<!-- Filter & Search Bar -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET" action="{% url 'super_admin_area_admins' %}" class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label">Search</label>
+                <input type="text" name="search" class="form-control" placeholder="Search by name or email..." value="{{ search_query }}">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Filter by Region</label>
+                <select name="area" class="form-select">
+                    <option value="">All Regions</option>
+                    {% for area in areas %}
+                        <option value="{{ area.id }}" {% if area_filter == area.id|stringformat:"s" %}selected{% endif %}>{{ area.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Sort By</label>
+                <select name="sort" class="form-select">
+                    <option value="name" {% if sort_by == "name" %}selected{% endif %}>Name (A-Z)</option>
+                    <option value="-name" {% if sort_by == "-name" %}selected{% endif %}>Name (Z-A)</option>
+                    <option value="email" {% if sort_by == "email" %}selected{% endif %}>Email (A-Z)</option>
+                    <option value="-email" {% if sort_by == "-email" %}selected{% endif %}>Email (Z-A)</option>
+                    <option value="area__name" {% if sort_by == "area__name" %}selected{% endif %}>Region (A-Z)</option>
+                    <option value="-area__name" {% if sort_by == "-area__name" %}selected{% endif %}>Region (Z-A)</option>
+                </select>
+            </div>
+            <div class="col-md-1">
+                <button type="submit" class="btn btn-primary w-100"><i class="fas fa-filter"></i></button>
+            </div>
+            <div class="col-md-1">
+                <a href="{% url 'super_admin_area_admins' %}" class="btn btn-outline-secondary w-100" title="Clear Filters"><i class="fas fa-times"></i></a>
+            </div>
+        </form>
+    </div>
+</div>
+
 <div class="card mb-4">
     <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-        <h5 class="mb-0"><i class="fas fa-table me-2"></i>All Shelter Admins</h5>
+        <h5 class="mb-0"><i class="fas fa-table me-2"></i>All Shelter Admins <span class="badge bg-light text-dark ms-2">{{ admins|length }}</span></h5>
         <button class="btn btn-light btn-sm" onclick="openAddAdminModal()">
             <i class="fas fa-user-plus me-2"></i>Add New Admin
         </button>
@@ -23,9 +61,21 @@
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Assigned Region</th>
+                        <th>
+                            <a href="?sort={% if sort_by == 'name' %}-name{% else %}name{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}{% if area_filter %}&area={{ area_filter }}{% endif %}" class="text-decoration-none text-dark">
+                                Name <i class="fas fa-sort ms-1 text-muted"></i>
+                            </a>
+                        </th>
+                        <th>
+                            <a href="?sort={% if sort_by == 'email' %}-email{% else %}email{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}{% if area_filter %}&area={{ area_filter }}{% endif %}" class="text-decoration-none text-dark">
+                                Email <i class="fas fa-sort ms-1 text-muted"></i>
+                            </a>
+                        </th>
+                        <th>
+                            <a href="?sort={% if sort_by == 'area__name' %}-area__name{% else %}area__name{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}{% if area_filter %}&area={{ area_filter }}{% endif %}" class="text-decoration-none text-dark">
+                                Assigned Region <i class="fas fa-sort ms-1 text-muted"></i>
+                            </a>
+                        </th>
                         <th>Status</th>
                         <th>Actions</th>
                     </tr>
@@ -51,10 +101,17 @@
                                 {% endif %}
                             </td>
                             <td>
-                                <button class="btn btn-sm btn-outline-primary" onclick="editAdmin({{ item.admin.id }}, '{{ item.admin.name|escapejs }}', '{{ item.admin.email }}', {{ item.admin.area.id }}, '{{ item.admin.user.username }}')">
+                                <button class="btn btn-sm btn-outline-primary btn-edit-admin"
+                                        data-admin-id="{{ item.admin.id }}"
+                                        data-name="{{ item.admin.name|escapejs }}"
+                                        data-email="{{ item.admin.email|escapejs }}"
+                                        data-area-id="{{ item.admin.area.id }}"
+                                        data-username="{{ item.admin.user.username|escapejs }}">
                                     <i class="fas fa-edit"></i> Edit
                                 </button>
-                                <button class="btn btn-sm btn-outline-danger" onclick="deleteAreaAdmin({{ item.admin.id }}, '{{ item.admin.name|escapejs }}')">
+                                <button class="btn btn-sm btn-outline-danger btn-delete-admin"
+                                        data-admin-id="{{ item.admin.id }}"
+                                        data-name="{{ item.admin.name|escapejs }}">
                                     <i class="fas fa-trash"></i> Delete
                                 </button>
                             </td>
@@ -140,20 +197,6 @@ function getCookie(name) {
     return cookieValue;
 }
 
-function editAdmin(adminId, name, email, areaId, username) {
-    document.getElementById('adminModalTitle').innerHTML = '<i class="fas fa-edit me-2"></i>Edit Shelter Admin';
-    document.getElementById('admin_id').value = adminId;
-    document.getElementById('admin_name').value = name;
-    document.getElementById('admin_email').value = email;
-    document.getElementById('admin_area').value = areaId;
-    document.getElementById('admin_username').value = username;
-    document.getElementById('admin_password').required = false;
-    document.getElementById('username_field').style.display = 'none';
-    document.getElementById('adminSubmitBtn').innerHTML = '<i class="fas fa-save me-2"></i>Update Admin';
-    var modal = new bootstrap.Modal(document.getElementById('adminModal'));
-    modal.show();
-}
-
 function openAddAdminModal() {
     document.getElementById('adminModalTitle').innerHTML = '<i class="fas fa-user-plus me-2"></i>Add New Shelter Admin';
     document.getElementById('admin_id').value = '';
@@ -165,32 +208,51 @@ function openAddAdminModal() {
     modal.show();
 }
 
-function deleteAreaAdmin(adminId, adminName) {
-    if (confirm(`Are you sure you want to delete the shelter admin "${adminName}"? This will also delete their user account.`)) {
-        const csrftoken = getCookie('csrftoken');
-        fetch(`/super-admin/area-admin/${adminId}/delete/`, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': csrftoken,
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-            },
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
-            } else {
-                alert('Error: ' + data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred while deleting the shelter admin.');
-        });
+document.addEventListener('click', function(e) {
+    const editBtn = e.target.closest('.btn-edit-admin');
+    if (editBtn) {
+        const d = editBtn.dataset;
+        document.getElementById('adminModalTitle').innerHTML = '<i class="fas fa-edit me-2"></i>Edit Shelter Admin';
+        document.getElementById('admin_id').value = d.adminId;
+        document.getElementById('admin_name').value = d.name;
+        document.getElementById('admin_email').value = d.email;
+        document.getElementById('admin_area').value = d.areaId;
+        document.getElementById('admin_username').value = d.username;
+        document.getElementById('admin_password').required = false;
+        document.getElementById('username_field').style.display = 'none';
+        document.getElementById('adminSubmitBtn').innerHTML = '<i class="fas fa-save me-2"></i>Update Admin';
+        var modal = new bootstrap.Modal(document.getElementById('adminModal'));
+        modal.show();
     }
-}
+
+    const delBtn = e.target.closest('.btn-delete-admin');
+    if (delBtn) {
+        const adminId   = delBtn.dataset.adminId;
+        const adminName = delBtn.dataset.name;
+        if (confirm('Are you sure you want to delete the shelter admin "' + adminName + '"? This will also delete their user account.')) {
+            const csrftoken = getCookie('csrftoken');
+            fetch('/super-admin/area-admin/' + adminId + '/delete/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while deleting the shelter admin.');
+            });
+        }
+    }
+});
 </script>
 {% endblock %}
-
-

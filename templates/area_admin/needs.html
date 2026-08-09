@@ -10,9 +10,63 @@
         <p class="text-muted">Add and update needs for your region</p>
 </div>
 
+<!-- Filter & Search Bar -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET" action="{% url 'area_admin_needs' %}" class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label">Search Item</label>
+                <input type="text" name="search" class="form-control" placeholder="Search by item name..." value="{{ search_query }}">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Filter by Category</label>
+                <select name="category" class="form-select">
+                    <option value="">All Categories</option>
+                    {% for cat in categories %}
+                        <option value="{{ cat.id }}" {% if category_filter == cat.id|stringformat:"s" %}selected{% endif %}>{{ cat.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Priority</label>
+                <select name="priority" class="form-select">
+                    <option value="">All Priorities</option>
+                    <option value="urgent" {% if priority_filter == "urgent" %}selected{% endif %}>Urgent</option>
+                    <option value="high" {% if priority_filter == "high" %}selected{% endif %}>High</option>
+                    <option value="medium" {% if priority_filter == "medium" %}selected{% endif %}>Medium</option>
+                    <option value="low" {% if priority_filter == "low" %}selected{% endif %}>Low</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Sort By</label>
+                <select name="sort" class="form-select">
+                    <option value="-created_at" {% if sort_by == "-created_at" %}selected{% endif %}>Newest First</option>
+                    <option value="created_at" {% if sort_by == "created_at" %}selected{% endif %}>Oldest First</option>
+                    <option value="product__name" {% if sort_by == "product__name" %}selected{% endif %}>Item Name (A-Z)</option>
+                    <option value="-product__name" {% if sort_by == "-product__name" %}selected{% endif %}>Item Name (Z-A)</option>
+                    <option value="quantity" {% if sort_by == "quantity" %}selected{% endif %}>Quantity (Low-High)</option>
+                    <option value="-quantity" {% if sort_by == "-quantity" %}selected{% endif %}>Quantity (High-Low)</option>
+                    <option value="priority" {% if sort_by == "priority" %}selected{% endif %}>Priority (Asc)</option>
+                    <option value="-priority" {% if sort_by == "-priority" %}selected{% endif %}>Priority (Desc)</option>
+                </select>
+            </div>
+            <div class="col-md-1">
+                <button type="submit" class="btn btn-primary w-100"><i class="fas fa-filter"></i></button>
+            </div>
+        </form>
+        {% if search_query or category_filter or priority_filter %}
+        <div class="mt-2">
+            <a href="{% url 'area_admin_needs' %}" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-times me-1"></i>Clear Filters
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
 <div class="card">
     <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-        <h5 class="mb-0"><i class="fas fa-table me-2"></i>What's Needed Now</h5>
+        <h5 class="mb-0"><i class="fas fa-table me-2"></i>What's Needed Now <span class="badge bg-light text-dark ms-2">{{ needs|length }}</span></h5>
         <button class="btn btn-light btn-sm" onclick="openAddNeedModal()">
             <i class="fas fa-plus me-2"></i>Add New Need
         </button>
@@ -26,6 +80,7 @@
                         <th>Category</th>
                         <th>Unit</th>
                         <th>Quantity</th>
+                        <th>Priority</th>
                         <th>Notes</th>
                         <th>Actions</th>
                     </tr>
@@ -47,6 +102,17 @@
                             <td>{{ item.product.unit }}</td>
                             <td><span class="badge bg-warning text-dark">{{ item.need.quantity }}</span></td>
                             <td>
+                                {% if item.need.priority == 'urgent' %}
+                                    <span class="badge bg-danger">Urgent</span>
+                                {% elif item.need.priority == 'high' %}
+                                    <span class="badge bg-warning text-dark">High</span>
+                                {% elif item.need.priority == 'medium' %}
+                                    <span class="badge bg-info">Medium</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Low</span>
+                                {% endif %}
+                            </td>
+                            <td>
                                 {% if item.need.notes %}
                                     {{ item.need.notes }}
                                 {% else %}
@@ -57,11 +123,14 @@
                                 <button class="btn btn-sm btn-outline-primary" onclick="editNeed({{ item.need.id }}, {{ item.product.id }}, {{ item.need.quantity }}, '{{ item.need.priority }}', '{{ item.need.notes|escapejs }}')">
                                     <i class="fas fa-edit"></i> Edit
                                 </button>
+                                <button class="btn btn-sm btn-outline-danger" onclick="deleteNeed({{ item.need.id }}, '{{ item.product.name|escapejs }}')">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
                             </td>
                         </tr>
                     {% empty %}
                         <tr>
-                            <td colspan="6" class="text-center py-4 text-muted">
+                            <td colspan="7" class="text-center py-4 text-muted">
                                 No needs recorded yet. Click "Add New Need" to get started.
                             </td>
                         </tr>
@@ -126,6 +195,21 @@
 </div>
 
 <script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
 function editNeed(needId, productId, quantity, priority, notes) {
     document.getElementById('needModalTitle').innerHTML = '<i class="fas fa-edit me-2"></i>Edit Need';
     document.getElementById('need_id').value = needId;
@@ -147,7 +231,31 @@ function openAddNeedModal() {
     var modal = new bootstrap.Modal(document.getElementById('needModal'));
     modal.show();
 }
+
+function deleteNeed(needId, productName) {
+    if (confirm(`Are you sure you want to delete the need for "${productName}"?`)) {
+        const csrftoken = getCookie('csrftoken');
+        fetch(`/area-admin/need/${needId}/delete/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrftoken,
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while deleting the need.');
+        });
+    }
+}
 </script>
 {% endblock %}
-
-

@@ -10,16 +10,75 @@
         <p class="text-muted">View available items to donate</p>
 </div>
 
+<!-- Filter & Search Bar -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET" action="{% url 'area_admin_products' %}" class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label">Search Item</label>
+                <input type="text" name="search" class="form-control" placeholder="Search by item name..." value="{{ search_query }}">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Filter by Category</label>
+                <select name="category" class="form-select">
+                    <option value="">All Categories</option>
+                    {% for cat in categories %}
+                        <option value="{{ cat.id }}" {% if category_filter == cat.id|stringformat:"s" %}selected{% endif %}>{{ cat.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Sort By</label>
+                <select name="sort" class="form-select">
+                    <option value="name" {% if sort_by == "name" %}selected{% endif %}>Name (A-Z)</option>
+                    <option value="-name" {% if sort_by == "-name" %}selected{% endif %}>Name (Z-A)</option>
+                    <option value="category__name" {% if sort_by == "category__name" %}selected{% endif %}>Category (A-Z)</option>
+                    <option value="-category__name" {% if sort_by == "-category__name" %}selected{% endif %}>Category (Z-A)</option>
+                    <option value="unit" {% if sort_by == "unit" %}selected{% endif %}>Unit (A-Z)</option>
+                    <option value="-unit" {% if sort_by == "-unit" %}selected{% endif %}>Unit (Z-A)</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-filter me-2"></i>Apply
+                </button>
+            </div>
+        </form>
+        {% if search_query or category_filter %}
+        <div class="mt-2">
+            <a href="{% url 'area_admin_products' %}" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-times me-1"></i>Clear Filters
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
 <div class="card">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="fas fa-table me-2"></i>All Items to Donate <span class="badge bg-light text-dark ms-2">{{ products|length }}</span></h5>
+    </div>
     <div class="card-body p-0">
         <div class="table-responsive">
             <table class="table table-hover mb-0">
                 <thead>
                     <tr>
-                        <th>Items to Donate</th>
-                        <th>Category</th>
+                        <th>
+                            <a href="?sort={% if sort_by == 'name' %}-name{% else %}name{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}" class="text-decoration-none text-dark">
+                                Items to Donate <i class="fas fa-sort ms-1 text-muted"></i>
+                            </a>
+                        </th>
+                        <th>
+                            <a href="?sort={% if sort_by == 'category__name' %}-category__name{% else %}category__name{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}" class="text-decoration-none text-dark">
+                                Category <i class="fas fa-sort ms-1 text-muted"></i>
+                            </a>
+                        </th>
                         <th>Description</th>
-                        <th>Unit</th>
+                        <th>
+                            <a href="?sort={% if sort_by == 'unit' %}-unit{% else %}unit{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}" class="text-decoration-none text-dark">
+                                Unit <i class="fas fa-sort ms-1 text-muted"></i>
+                            </a>
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -57,5 +116,3 @@
     </div>
 </div>
 {% endblock %}
-
-
