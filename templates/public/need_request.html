@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}Request Help - Hurricane Heroes{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="page-header">
+        <h2 class="fw-bold mb-3">
+            <i class="fas fa-hand-holding-heart me-2"></i>Request Help
+        </h2>
+        <p class="text-muted">Need relief supplies? Submit a request and our team will review it.</p>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card">
+                <div class="card-body p-4">
+                    <form method="POST" action="{% url 'public_need_request' %}">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="name" class="form-label">Your Name *</label>
+                                <input type="text" class="form-control" id="name" name="name" required placeholder="Enter your name">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Email *</label>
+                                <input type="email" class="form-control" id="email" name="email" required placeholder="Enter your email">
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="phone" class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" id="phone" name="phone" placeholder="Optional">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="area" class="form-label">Nearest Shelter *</label>
+                                <select class="form-select" id="area" name="area" required>
+                                    <option value="">Select a shelter</option>
+                                    {% for area in areas %}
+                                    <option value="{{ area.id }}">{{ area.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="item_needed" class="form-label">Item Needed *</label>
+                                <input type="text" class="form-control" id="item_needed" name="item_needed" required placeholder="E.g., Water bottles, Blankets, First aid kit">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="quantity" class="form-label">Quantity *</label>
+                                <input type="number" class="form-control" id="quantity" name="quantity" min="1" required placeholder="How many?">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="urgency" class="form-label">Urgency</label>
+                                <select class="form-select" id="urgency" name="urgency">
+                                    <option value="low">Low</option>
+                                    <option value="medium" selected>Medium</option>
+                                    <option value="high">High</option>
+                                    <option value="urgent">Urgent</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Additional Details</label>
+                            <textarea class="form-control" id="description" name="description" rows="3" placeholder="Any extra details about what you need..."></textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-paper-plane me-2"></i>Submit Request
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

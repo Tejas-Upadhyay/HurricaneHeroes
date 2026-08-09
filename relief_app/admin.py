@@ -3,7 +3,7 @@ Django Admin configuration for Hurricane Heroes Relief Management System
 """
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import CustomUser, Category, Area, Product, Need, AreaAdmin, Contact
+from .models import CustomUser, Category, Area, Product, Need, AreaAdmin, Contact, Volunteer, NeedRequest
 
 
 # Custom User Admin
@@ -121,3 +121,28 @@ class ContactAdmin(admin.ModelAdmin):
         }),
     )
 
+
+# Volunteer Admin
+@admin.register(Volunteer)
+class VolunteerAdmin(admin.ModelAdmin):
+    list_display = ('name', 'email', 'phone', 'area', 'availability', 'created_at')
+    search_fields = ('name', 'email', 'phone')
+    list_filter = ('area', 'availability', 'created_at')
+
+
+# Need Request Admin
+@admin.register(NeedRequest)
+class NeedRequestAdmin(admin.ModelAdmin):
+    list_display = ('name', 'item_needed', 'quantity', 'urgency', 'area', 'status', 'created_at')
+    search_fields = ('name', 'email', 'item_needed')
+    list_filter = ('status', 'urgency', 'area', 'created_at')
+
+
+# Donation Admin
+from .models import Donation
+
+@admin.register(Donation)
+class DonationAdmin(admin.ModelAdmin):
+    list_display = ('donor_name', 'item_name', 'quantity', 'area', 'created_at')
+    search_fields = ('donor_name', 'email', 'item_name')
+    list_filter = ('area', 'created_at')

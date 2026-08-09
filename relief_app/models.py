@@ -48,6 +48,8 @@ class Area(models.Model):
     description = models.TextField(blank=True)
     address = models.CharField(max_length=500)
     pincode = models.CharField(max_length=10)
+    latitude = models.FloatField(null=True, blank=True)
+    longitude = models.FloatField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -160,3 +162,76 @@ class Contact(models.Model):
     
     def __str__(self):
         return f"{self.name} - {self.subject}"
+
+
+# Volunteer Model
+class Volunteer(models.Model):
+    name = models.CharField(max_length=200)
+    email = models.EmailField()
+    phone = models.CharField(max_length=20)
+    area = models.ForeignKey(Area, on_delete=models.CASCADE, related_name='volunteers')
+    skills = models.TextField(blank=True, help_text='Any relevant skills or experience')
+    availability = models.CharField(max_length=100, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = 'Volunteer'
+        verbose_name_plural = 'Volunteers'
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.name} - {self.area.name}"
+
+
+# Public Need Request Model
+class NeedRequest(models.Model):
+    STATUS_CHOICES = [
+        ('new', 'New'),
+        ('reviewed', 'Reviewed'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+    ]
+    
+    name = models.CharField(max_length=200)
+    email = models.EmailField()
+    phone = models.CharField(max_length=20, blank=True)
+    area = models.ForeignKey(Area, on_delete=models.CASCADE, related_name='need_requests')
+    item_needed = models.CharField(max_length=200)
+    quantity = models.IntegerField(validators=[MinValueValidator(1)])
+    urgency = models.CharField(max_length=20, choices=[
+        ('low', 'Low'),
+        ('medium', 'Medium'),
+        ('high', 'High'),
+        ('urgent', 'Urgent'),
+    ], default='medium')
+    description = models.TextField(blank=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='new')
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = 'Need Request'
+        verbose_name_plural = 'Need Requests'
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.name} - {self.item_needed}"
+
+
+
+# Donation Model
+class Donation(models.Model):
+    donor_name = models.CharField(max_length=200)
+    email = models.EmailField(blank=True)
+    area = models.ForeignKey(Area, on_delete=models.CASCADE, related_name='donations')
+    item_name = models.CharField(max_length=200)
+    quantity = models.IntegerField(validators=[MinValueValidator(1)])
+    notes = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = 'Donation'
+        verbose_name_plural = 'Donations'
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.donor_name} - {self.item_name} ({self.quantity})"

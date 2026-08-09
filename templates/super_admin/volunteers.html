@@ -1,0 +1,74 @@
+{% extends 'super_admin/base.html' %}
+
+{% block title %}Volunteers - Hurricane Heroes Admin{% endblock %}
+
+{% block super_admin_content %}
+<div class="page-header">
+    <h2 class="fw-bold mb-3">
+        <i class="fas fa-hands-helping me-2"></i>Volunteers
+    </h2>
+    <p class="text-muted">All registered volunteers</p>
+</div>
+
+<!-- Filter -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET" class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label">Filter by Shelter</label>
+                <select class="form-select" name="area">
+                    <option value="">All Shelters</option>
+                    {% for area in areas %}
+                    <option value="{{ area.id }}" {% if area_filter == area.id|stringformat:"s" %}selected{% endif %}>
+                        {{ area.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary">Filter</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Volunteers Table -->
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Shelter</th>
+                        <th>Availability</th>
+                        <th>Skills</th>
+                        <th>Signed Up</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for volunteer in volunteers %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td><strong>{{ volunteer.name }}</strong></td>
+                        <td>{{ volunteer.email }}</td>
+                        <td>{{ volunteer.phone }}</td>
+                        <td><span class="badge bg-info">{{ volunteer.area.name }}</span></td>
+                        <td>{{ volunteer.availability|default:"-" }}</td>
+                        <td>{{ volunteer.skills|truncatewords:10|default:"-" }}</td>
+                        <td>{{ volunteer.created_at|date:"M d, Y" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center text-muted">No volunteers registered yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

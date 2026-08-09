@@ -29,8 +29,15 @@
 {% block content %}
 <div class="container-fluid">
     <div class="row">
+        <!-- Mobile Sidebar Toggle -->
+        <div class="d-md-none p-2">
+            <button class="btn btn-primary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu">
+                <i class="fas fa-bars me-2"></i>Menu
+            </button>
+        </div>
+        
         <!-- Sidebar -->
-        <nav class="col-md-2 sidebar d-md-block">
+        <nav class="col-md-2 sidebar d-md-block collapse" id="sidebarMenu">
             <div class="position-sticky pt-3">
                 <ul class="nav flex-column">
                     <li class="nav-item">
@@ -66,6 +73,21 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'super_admin_contacts' %}">
                             <i class="fas fa-envelope me-2"></i>Contact Messages
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'super_admin_volunteers' %}">
+                            <i class="fas fa-hands-helping me-2"></i>Volunteers
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'super_admin_need_requests' %}">
+                            <i class="fas fa-hand-holding-heart me-2"></i>Need Requests
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'super_admin_donations' %}">
+                            <i class="fas fa-gift me-2"></i>Donations
                         </a>
                     </li>
                     <li class="nav-item">

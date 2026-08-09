@@ -17,6 +17,7 @@ import csv
 import json
 import sqlite3
 import os
+import urllib.parse
 from datetime import datetime
 
 # Get BASE_DIR (parent of relief_app, which is parent of relief_system)
@@ -34,12 +35,22 @@ def get_statistics():
     total_needs = Need.objects.count()
     total_products = Product.objects.count()
     total_area_admins = AreaAdmin.objects.filter(is_active=True).count()
+    total_volunteers = 0
+    total_donations = 0
+    try:
+        from .models import Volunteer, Donation
+        total_volunteers = Volunteer.objects.count()
+        total_donations = Donation.objects.count()
+    except Exception:
+        pass
     
     return {
         'total_areas': total_areas,
         'total_needs': total_needs,
         'total_products': total_products,
         'total_area_admins': total_area_admins,
+        'total_volunteers': total_volunteers,
+        'total_donations': total_donations,
     }
 
 
@@ -458,6 +469,23 @@ def super_admin_areas(request):
                     pincode=pincode
                 )
                 messages.success(request, f'Area "{name}" created successfully!')
+            
+            # Auto-geocode the address to get lat/lng for the map
+            try:
+                import urllib.request
+                query = f"{address}, {pincode}"
+                encoded_query = urllib.parse.quote(query)
+                url = f"https://nominatim.openstreetmap.org/search?q={encoded_query}&format=json&limit=1"
+                req = urllib.request.Request(url, headers={'User-Agent': 'HurricaneHeroes/1.0'})
+                response = urllib.request.urlopen(req, timeout=5)
+                data = json.loads(response.read())
+                if data:
+                    area.latitude = float(data[0]['lat'])
+                    area.longitude = float(data[0]['lon'])
+                    area.save()
+            except Exception:
+                pass  # Map will just skip this shelter if geocoding fails
+                
         except Exception as e:
             messages.error(request, f'Error: {str(e)}')
         
@@ -1274,3 +1302,323 @@ def import_database(request):
     except Exception as e:
         messages.error(request, f'Error importing database: {str(e)}')
         return redirect('database_management')
+
+
+# ============================================
+# NEW FEATURES: Map, Volunteers, Need Requests, Charts
+# ============================================
+
+from .models import Volunteer, NeedRequest
+
+
+def shelter_map(request):
+    """Interactive map showing all shelter locations"""
+    areas = Area.objects.all()
+    
+    # Build list of shelters with coordinates for the map
+    shelters = []
+    for area in areas:
+        if area.latitude and area.longitude:
+            needs_count = Need.objects.filter(area=area).count()
+            shelters.append({
+                'id': area.id,
+                'name': area.name,
+                'address': area.address,
+                'pincode': area.pincode,
+                'lat': area.latitude,
+                'lng': area.longitude,
+                'needs_count': needs_count,
+            })
+    
+    context = {
+        'shelters': json.dumps(shelters),
+        'total_shelters': areas.count(),
+    }
+    return render(request, 'public/map.html', context)
+
+
+def volunteer_signup(request):
+    """Volunteer registration form"""
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        phone = request.POST.get('phone')
+        area_id = request.POST.get('area')
+        skills = request.POST.get('skills', '')
+        availability = request.POST.get('availability', '')
+        
+        if name and email and phone and area_id:
+            try:
+                area = Area.objects.get(id=area_id)
+                Volunteer.objects.create(
+                    name=name,
+                    email=email,
+                    phone=phone,
+                    area=area,
+                    skills=skills,
+                    availability=availability,
+                )
+                messages.success(request, 'Thank you for signing up as a volunteer! We will contact you soon.')
+                return redirect('volunteer_signup')
+            except Area.DoesNotExist:
+                messages.error(request, 'Selected shelter not found.')
+            except Exception as e:
+                messages.error(request, f'Error: {str(e)}')
+        else:
+            messages.error(request, 'Please fill in all required fields.')
+    
+    areas = Area.objects.all().order_by('name')
+    context = {
+        'areas': areas,
+    }
+    return render(request, 'public/volunteer_signup.html', context)
+
+
+def public_need_request(request):
+    """Public form for people to request relief items"""
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        phone = request.POST.get('phone', '')
+        area_id = request.POST.get('area')
+        item_needed = request.POST.get('item_needed')
+        quantity = request.POST.get('quantity')
+        urgency = request.POST.get('urgency', 'medium')
+        description = request.POST.get('description', '')
+        
+        if name and email and area_id and item_needed and quantity:
+            try:
+                area = Area.objects.get(id=area_id)
+                NeedRequest.objects.create(
+                    name=name,
+                    email=email,
+                    phone=phone,
+                    area=area,
+                    item_needed=item_needed,
+                    quantity=int(quantity),
+                    urgency=urgency,
+                    description=description,
+                )
+                messages.success(request, 'Your request has been submitted! Our team will review it shortly.')
+                return redirect('public_need_request')
+            except Area.DoesNotExist:
+                messages.error(request, 'Selected shelter not found.')
+            except Exception as e:
+                messages.error(request, f'Error: {str(e)}')
+        else:
+            messages.error(request, 'Please fill in all required fields.')
+    
+    areas = Area.objects.all().order_by('name')
+    context = {
+        'areas': areas,
+    }
+    return render(request, 'public/need_request.html', context)
+
+
+@login_required
+def dashboard_charts_data(request):
+    """API endpoint to provide chart data for dashboards"""
+    if request.user.user_type != 'super_admin':
+        return JsonResponse({'error': 'Access denied'}, status=403)
+    
+    # Needs by area
+    areas = Area.objects.all()
+    needs_by_area = []
+    for area in areas:
+        count = Need.objects.filter(area=area).count()
+        if count > 0:
+            needs_by_area.append({'area': area.name, 'count': count})
+    
+    # Needs by priority
+    priorities = ['urgent', 'high', 'medium', 'low']
+    needs_by_priority = []
+    for p in priorities:
+        count = Need.objects.filter(priority=p).count()
+        needs_by_priority.append({'priority': p.capitalize(), 'count': count})
+    
+    # Needs by category
+    categories = Category.objects.all()
+    needs_by_category = []
+    for cat in categories:
+        count = Need.objects.filter(product__category=cat).count()
+        if count > 0:
+            needs_by_category.append({'category': cat.name, 'count': count})
+    
+    # Needs by status
+    statuses = ['pending', 'in_progress', 'fulfilled', 'cancelled']
+    needs_by_status = []
+    for s in statuses:
+        count = Need.objects.filter(status=s).count()
+        needs_by_status.append({'status': s.replace('_', ' ').capitalize(), 'count': count})
+    
+    data = {
+        'needs_by_area': needs_by_area,
+        'needs_by_priority': needs_by_priority,
+        'needs_by_category': needs_by_category,
+        'needs_by_status': needs_by_status,
+    }
+    return JsonResponse(data)
+
+
+@login_required
+def super_admin_volunteers(request):
+    """View all volunteers for super admin"""
+    if request.user.user_type != 'super_admin':
+        return redirect('login')
+    
+    volunteers = Volunteer.objects.select_related('area').all()
+    
+    # Filter by area
+    area_filter = request.GET.get('area', '')
+    if area_filter:
+        volunteers = volunteers.filter(area_id=area_filter)
+    
+    context = {
+        'volunteers': volunteers,
+        'areas': Area.objects.all().order_by('name'),
+        'area_filter': area_filter,
+    }
+    return render(request, 'super_admin/volunteers.html', context)
+
+
+@login_required
+def super_admin_need_requests(request):
+    """View and manage public need requests"""
+    if request.user.user_type != 'super_admin':
+        return redirect('login')
+    
+    # Handle status update
+    if request.method == 'POST':
+        request_id = request.POST.get('request_id')
+        new_status = request.POST.get('status')
+        try:
+            need_request = NeedRequest.objects.get(id=request_id)
+            need_request.status = new_status
+            need_request.save()
+            messages.success(request, f'Request status updated to {new_status}!')
+        except NeedRequest.DoesNotExist:
+            messages.error(request, 'Request not found.')
+    
+    need_requests = NeedRequest.objects.select_related('area').all()
+    
+    # Filter by status
+    status_filter = request.GET.get('status', '')
+    if status_filter:
+        need_requests = need_requests.filter(status=status_filter)
+    
+    context = {
+        'need_requests': need_requests,
+        'status_filter': status_filter,
+    }
+    return render(request, 'super_admin/need_requests.html', context)
+
+
+
+from .models import Donation
+
+
+def donate(request):
+    """Public donation logging form"""
+    if request.method == 'POST':
+        donor_name = request.POST.get('donor_name')
+        email = request.POST.get('email', '')
+        area_id = request.POST.get('area')
+        item_name = request.POST.get('item_name')
+        quantity = request.POST.get('quantity')
+        notes = request.POST.get('notes', '')
+        
+        if donor_name and area_id and item_name and quantity:
+            try:
+                area = Area.objects.get(id=area_id)
+                Donation.objects.create(
+                    donor_name=donor_name,
+                    email=email,
+                    area=area,
+                    item_name=item_name,
+                    quantity=int(quantity),
+                    notes=notes,
+                )
+                messages.success(request, 'Thank you for your donation! Your contribution has been recorded.')
+                return redirect('donate')
+            except Area.DoesNotExist:
+                messages.error(request, 'Selected shelter not found.')
+            except Exception as e:
+                messages.error(request, f'Error: {str(e)}')
+        else:
+            messages.error(request, 'Please fill in all required fields.')
+    
+    areas = Area.objects.all().order_by('name')
+    recent_donations = Donation.objects.select_related('area').all()[:10]
+    total_donations = Donation.objects.count()
+    
+    context = {
+        'areas': areas,
+        'recent_donations': recent_donations,
+        'total_donations': total_donations,
+    }
+    return render(request, 'public/donate.html', context)
+
+
+@login_required
+def super_admin_donations(request):
+    """View all donations for super admin"""
+    if request.user.user_type != 'super_admin':
+        return redirect('login')
+    
+    donations = Donation.objects.select_related('area').all()
+    
+    # Filter by area
+    area_filter = request.GET.get('area', '')
+    if area_filter:
+        donations = donations.filter(area_id=area_filter)
+    
+    context = {
+        'donations': donations,
+        'areas': Area.objects.all().order_by('name'),
+        'area_filter': area_filter,
+        'total_donations': donations.count(),
+    }
+    return render(request, 'super_admin/donations.html', context)
+
+
+
+def global_search(request):
+    """Search across shelters, products, and needs"""
+    query = request.GET.get('q', '').strip()
+    
+    results = {
+        'areas': [],
+        'products': [],
+        'needs': [],
+    }
+    
+    if query:
+        # Search areas/shelters
+        results['areas'] = Area.objects.filter(
+            Q(name__icontains=query) |
+            Q(address__icontains=query) |
+            Q(pincode__icontains=query)
+        )[:10]
+        
+        # Search products
+        results['products'] = Product.objects.filter(
+            Q(name__icontains=query) |
+            Q(description__icontains=query) |
+            Q(category__name__icontains=query)
+        ).select_related('category')[:10]
+        
+        # Search needs
+        results['needs'] = Need.objects.filter(
+            Q(product__name__icontains=query) |
+            Q(area__name__icontains=query) |
+            Q(notes__icontains=query)
+        ).select_related('product', 'area')[:10]
+    
+    total_results = len(results['areas']) + len(results['products']) + len(results['needs'])
+    
+    context = {
+        'query': query,
+        'results': results,
+        'total_results': total_results,
+    }
+    return render(request, 'public/search.html', context)

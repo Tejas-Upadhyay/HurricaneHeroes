@@ -1,0 +1,74 @@
+{% extends 'super_admin/base.html' %}
+
+{% block title %}Donations - Hurricane Heroes Admin{% endblock %}
+
+{% block super_admin_content %}
+<div class="page-header">
+    <h2 class="fw-bold mb-3">
+        <i class="fas fa-gift me-2"></i>Donations ({{ total_donations }} total)
+    </h2>
+    <p class="text-muted">All donations logged by the community</p>
+</div>
+
+<!-- Filter -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET" class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label">Filter by Shelter</label>
+                <select class="form-select" name="area">
+                    <option value="">All Shelters</option>
+                    {% for area in areas %}
+                    <option value="{{ area.id }}" {% if area_filter == area.id|stringformat:"s" %}selected{% endif %}>
+                        {{ area.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary">Filter</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Donations Table -->
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Donor</th>
+                        <th>Email</th>
+                        <th>Item</th>
+                        <th>Qty</th>
+                        <th>Shelter</th>
+                        <th>Notes</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for donation in donations %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td><strong>{{ donation.donor_name }}</strong></td>
+                        <td>{{ donation.email|default:"-" }}</td>
+                        <td>{{ donation.item_name }}</td>
+                        <td><span class="badge bg-success">{{ donation.quantity }}</span></td>
+                        <td><span class="badge bg-info">{{ donation.area.name }}</span></td>
+                        <td>{{ donation.notes|truncatewords:8|default:"-" }}</td>
+                        <td>{{ donation.created_at|date:"M d, Y" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center text-muted">No donations logged yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -129,6 +129,57 @@
     {% endfor %}
 </div>
 
+<!-- Charts Section -->
+<div class="row mb-4">
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h6 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Needs by Priority</h6>
+            </div>
+            <div class="card-body text-center">
+                <div class="chart-spinner spinner-border spinner-border-sm text-primary my-3" role="status"></div>
+                <canvas id="priorityChart" height="250" style="display:none;"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h6 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Needs by Category</h6>
+            </div>
+            <div class="card-body text-center">
+                <div class="chart-spinner spinner-border spinner-border-sm text-primary my-3" role="status"></div>
+                <canvas id="categoryChart" height="250" style="display:none;"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h6 class="mb-0"><i class="fas fa-chart-line me-2"></i>Needs by Shelter</h6>
+            </div>
+            <div class="card-body text-center">
+                <div class="chart-spinner spinner-border spinner-border-sm text-primary my-3" role="status"></div>
+                <canvas id="areaChart" height="250" style="display:none;"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h6 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Needs by Status</h6>
+            </div>
+            <div class="card-body text-center">
+                <div class="chart-spinner spinner-border spinner-border-sm text-primary my-3" role="status"></div>
+                <canvas id="statusChart" height="250" style="display:none;"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Quick Actions -->
 <div class="card mt-4">
     <div class="card-header bg-primary text-white">
@@ -166,5 +217,81 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+    // Fetch chart data from API
+    fetch('{% url "dashboard_charts_data" %}')
+        .then(response => response.json())
+        .then(data => {
+            // Hide all spinners, show all canvases
+            document.querySelectorAll('.chart-spinner').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('canvas').forEach(el => el.style.display = 'block');
+            
+            // Priority Chart (Bar)
+            new Chart(document.getElementById('priorityChart'), {
+                type: 'bar',
+                data: {
+                    labels: data.needs_by_priority.map(item => item.priority),
+                    datasets: [{
+                        label: 'Needs Count',
+                        data: data.needs_by_priority.map(item => item.count),
+                        backgroundColor: ['#dc2626', '#f59e0b', '#0891b2', '#6b7280'],
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } }
+                }
+            });
+            
+            // Category Chart (Doughnut)
+            new Chart(document.getElementById('categoryChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: data.needs_by_category.map(item => item.category),
+                    datasets: [{
+                        data: data.needs_by_category.map(item => item.count),
+                        backgroundColor: ['#2563eb', '#16a34a', '#f59e0b', '#dc2626', '#8b5cf6', '#0891b2'],
+                    }]
+                },
+                options: { responsive: true }
+            });
+            
+            // Area Chart (Horizontal Bar)
+            new Chart(document.getElementById('areaChart'), {
+                type: 'bar',
+                data: {
+                    labels: data.needs_by_area.map(item => item.area),
+                    datasets: [{
+                        label: 'Needs',
+                        data: data.needs_by_area.map(item => item.count),
+                        backgroundColor: '#2563eb',
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    plugins: { legend: { display: false } }
+                }
+            });
+            
+            // Status Chart (Pie)
+            new Chart(document.getElementById('statusChart'), {
+                type: 'pie',
+                data: {
+                    labels: data.needs_by_status.map(item => item.status),
+                    datasets: [{
+                        data: data.needs_by_status.map(item => item.count),
+                        backgroundColor: ['#f59e0b', '#0891b2', '#16a34a', '#6b7280'],
+                    }]
+                },
+                options: { responsive: true }
+            });
+        });
+</script>
 {% endblock %}
 

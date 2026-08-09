@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block title %}Search Results - Hurricane Heroes{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="page-header">
+        <h2 class="fw-bold mb-3">
+            <i class="fas fa-search me-2"></i>Search Results
+        </h2>
+        {% if query %}
+        <p class="text-muted">{{ total_results }} result{{ total_results|pluralize }} for "<strong>{{ query }}</strong>"</p>
+        {% endif %}
+    </div>
+    
+    <!-- Search Form -->
+    <form method="GET" action="{% url 'global_search' %}" class="mb-4">
+        <div class="input-group">
+            <input type="text" class="form-control form-control-lg" name="q" value="{{ query }}" placeholder="Search shelters, products, needs...">
+            <button class="btn btn-primary" type="submit">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+    </form>
+    
+    {% if query %}
+        <!-- Shelters -->
+        {% if results.areas %}
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-map-marker-alt me-2"></i>Shelters ({{ results.areas|length }})</h5>
+            </div>
+            <div class="card-body">
+                {% for area in results.areas %}
+                <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+                    <div>
+                        <strong>{{ area.name }}</strong>
+                        <br><small class="text-muted">{{ area.address }} - {{ area.pincode }}</small>
+                    </div>
+                    <a href="{% url 'public_area_detail' area.id %}" class="btn btn-sm btn-outline-primary">
+                        View <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Products -->
+        {% if results.products %}
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-box me-2"></i>Products ({{ results.products|length }})</h5>
+            </div>
+            <div class="card-body">
+                {% for product in results.products %}
+                <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+                    <div>
+                        <strong>{{ product.name }}</strong>
+                        <span class="badge bg-info ms-2">{{ product.category.name }}</span>
+                        <br><small class="text-muted">Unit: {{ product.unit }}</small>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Needs -->
+        {% if results.needs %}
+        <div class="card mb-4">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Active Needs ({{ results.needs|length }})</h5>
+            </div>
+            <div class="card-body">
+                {% for need in results.needs %}
+                <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+                    <div>
+                        <strong>{{ need.product.name }}</strong> — {{ need.quantity }} {{ need.product.unit }}
+                        <br><small class="text-muted">{{ need.area.name }} | Priority: {{ need.get_priority_display }}</small>
+                    </div>
+                    <a href="{% url 'public_area_detail' need.area.id %}" class="btn btn-sm btn-outline-primary">
+                        View Shelter <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if not results.areas and not results.products and not results.needs %}
+        <div class="card p-5 text-center">
+            <i class="fas fa-search fa-3x text-muted mb-3"></i>
+            <p class="text-muted">No results found for "{{ query }}". Try different keywords.</p>
+        </div>
+        {% endif %}
+    {% else %}
+    <div class="card p-5 text-center">
+        <i class="fas fa-search fa-3x text-muted mb-3"></i>
+        <p class="text-muted">Enter a search term to find shelters, products, or needs.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

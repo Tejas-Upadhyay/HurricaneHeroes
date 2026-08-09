@@ -1,0 +1,97 @@
+{% extends 'super_admin/base.html' %}
+
+{% block title %}Need Requests - Hurricane Heroes Admin{% endblock %}
+
+{% block super_admin_content %}
+<div class="page-header">
+    <h2 class="fw-bold mb-3">
+        <i class="fas fa-hand-holding-heart me-2"></i>Public Need Requests
+    </h2>
+    <p class="text-muted">Requests submitted by the public for relief items</p>
+</div>
+
+<!-- Filter -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET" class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label">Filter by Status</label>
+                <select class="form-select" name="status">
+                    <option value="">All Status</option>
+                    <option value="new" {% if status_filter == 'new' %}selected{% endif %}>New</option>
+                    <option value="reviewed" {% if status_filter == 'reviewed' %}selected{% endif %}>Reviewed</option>
+                    <option value="approved" {% if status_filter == 'approved' %}selected{% endif %}>Approved</option>
+                    <option value="rejected" {% if status_filter == 'rejected' %}selected{% endif %}>Rejected</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary">Filter</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Requests Table -->
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Item Needed</th>
+                        <th>Qty</th>
+                        <th>Urgency</th>
+                        <th>Shelter</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for req in need_requests %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>
+                            <strong>{{ req.name }}</strong><br>
+                            <small class="text-muted">{{ req.email }}</small>
+                        </td>
+                        <td>{{ req.item_needed }}</td>
+                        <td>{{ req.quantity }}</td>
+                        <td>
+                            <span class="badge bg-{% if req.urgency == 'urgent' %}danger{% elif req.urgency == 'high' %}warning{% elif req.urgency == 'medium' %}info{% else %}secondary{% endif %}">
+                                {{ req.get_urgency_display }}
+                            </span>
+                        </td>
+                        <td>{{ req.area.name }}</td>
+                        <td>
+                            <span class="badge bg-{% if req.status == 'new' %}primary{% elif req.status == 'approved' %}success{% elif req.status == 'rejected' %}danger{% else %}info{% endif %}">
+                                {{ req.get_status_display }}
+                            </span>
+                        </td>
+                        <td>{{ req.created_at|date:"M d, Y" }}</td>
+                        <td>
+                            <form method="POST" class="d-inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="request_id" value="{{ req.id }}">
+                                <select name="status" class="form-select form-select-sm d-inline" style="width: auto;" onchange="this.form.submit()">
+                                    <option value="new" {% if req.status == 'new' %}selected{% endif %}>New</option>
+                                    <option value="reviewed" {% if req.status == 'reviewed' %}selected{% endif %}>Reviewed</option>
+                                    <option value="approved" {% if req.status == 'approved' %}selected{% endif %}>Approved</option>
+                                    <option value="rejected" {% if req.status == 'rejected' %}selected{% endif %}>Rejected</option>
+                                </select>
+                            </form>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9" class="text-center text-muted">No requests yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

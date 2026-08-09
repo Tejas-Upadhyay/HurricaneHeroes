@@ -12,6 +12,11 @@ urlpatterns = [
     path('contact/', views.public_contact, name='public_contact'),
     path('areas/', views.public_areas, name='public_areas'),
     path('area/<int:area_id>/', views.public_area_detail, name='public_area_detail'),
+    path('map/', views.shelter_map, name='shelter_map'),
+    path('volunteer/', views.volunteer_signup, name='volunteer_signup'),
+    path('request-help/', views.public_need_request, name='public_need_request'),
+    path('donate/', views.donate, name='donate'),
+    path('search/', views.global_search, name='global_search'),
     
     # Authentication
     path('login/', views.login_view, name='login'),
@@ -33,6 +38,10 @@ urlpatterns = [
     path('super-admin/products/', views.super_admin_products, name='super_admin_products'),
     path('super-admin/product/<int:product_id>/delete/', views.delete_product, name='delete_product'),
     path('super-admin/contacts/', views.super_admin_contacts, name='super_admin_contacts'),
+    path('super-admin/volunteers/', views.super_admin_volunteers, name='super_admin_volunteers'),
+    path('super-admin/need-requests/', views.super_admin_need_requests, name='super_admin_need_requests'),
+    path('super-admin/donations/', views.super_admin_donations, name='super_admin_donations'),
+    path('super-admin/charts-data/', views.dashboard_charts_data, name='dashboard_charts_data'),
     path('super-admin/need/<int:need_id>/view/', views.view_need_detail, name='view_need_detail'),
     path('super-admin/need/<int:need_id>/delete/', views.delete_need, name='delete_need'),
     path('super-admin/category/<int:category_id>/delete/', views.delete_category, name='delete_category'),

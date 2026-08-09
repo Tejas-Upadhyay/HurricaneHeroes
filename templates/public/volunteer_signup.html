@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}Volunteer Sign Up - Hurricane Heroes{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="page-header">
+        <h2 class="fw-bold mb-3">
+            <i class="fas fa-hands-helping me-2"></i>Volunteer Sign Up
+        </h2>
+        <p class="text-muted">Join our team of volunteers and help your community during hurricane season</p>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card">
+                <div class="card-body p-4">
+                    <form method="POST" action="{% url 'volunteer_signup' %}">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="name" class="form-label">Full Name *</label>
+                                <input type="text" class="form-control" id="name" name="name" required placeholder="Enter your full name">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Email *</label>
+                                <input type="email" class="form-control" id="email" name="email" required placeholder="Enter your email">
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="phone" class="form-label">Phone Number *</label>
+                                <input type="tel" class="form-control" id="phone" name="phone" required placeholder="Enter your phone number">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="area" class="form-label">Preferred Shelter *</label>
+                                <select class="form-select" id="area" name="area" required>
+                                    <option value="">Select a shelter</option>
+                                    {% for area in areas %}
+                                    <option value="{{ area.id }}">{{ area.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="availability" class="form-label">Availability</label>
+                            <select class="form-select" id="availability" name="availability">
+                                <option value="">Select availability</option>
+                                <option value="Weekdays">Weekdays</option>
+                                <option value="Weekends">Weekends</option>
+                                <option value="Anytime">Anytime</option>
+                                <option value="Emergencies Only">Emergencies Only</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="skills" class="form-label">Skills or Experience</label>
+                            <textarea class="form-control" id="skills" name="skills" rows="3" placeholder="E.g., First aid, driving, cooking, construction, etc."></textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-user-plus me-2"></i>Sign Up as Volunteer
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

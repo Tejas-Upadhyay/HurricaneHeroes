@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block title %}Shelter Map - Hurricane Heroes{% endblock %}
+
+{% block extra_css %}
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+    #map {
+        height: 600px;
+        width: 100%;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .leaflet-popup-content h5 {
+        color: #0b34eb;
+        margin-bottom: 5px;
+    }
+    
+    .leaflet-popup-content p {
+        margin: 3px 0;
+        font-size: 0.9rem;
+    }
+    
+    @media (max-width: 768px) {
+        #map {
+            height: 400px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="page-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="fw-bold mb-3">
+                    <i class="fas fa-map-marked-alt me-2"></i>Shelter Map
+                </h2>
+                <p class="text-muted">Interactive map showing all {{ total_shelters }} shelter locations in Southwest Florida</p>
+            </div>
+            <a href="{% url 'public_areas' %}" class="btn btn-outline-primary">
+                <i class="fas fa-list me-2"></i>View as List
+            </a>
+        </div>
+    </div>
+    
+    <div id="map-loading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading map...</span>
+        </div>
+        <p class="text-muted mt-2">Loading map...</p>
+    </div>
+    <div id="map"></div>
+    
+    <div class="mt-3 text-center">
+        <small class="text-muted">
+            <i class="fas fa-info-circle me-1"></i>
+            Click on a marker to see shelter details and current needs count.
+        </small>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    // Hide spinner, show map
+    document.getElementById('map-loading').style.display = 'none';
+    
+    var map = L.map('map').setView([26.45, -81.8], 10);
+    
+    // Add OpenStreetMap tiles (free, no API key needed)
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+    
+    // Shelter data from Django
+    var shelters = {{ shelters|safe }};
+    
+    // Add markers for each shelter
+    for (var i = 0; i < shelters.length; i++) {
+        var shelter = shelters[i];
+        var marker = L.marker([shelter.lat, shelter.lng]).addTo(map);
+        
+        var popupContent = '<h5>' + shelter.name + '</h5>' +
+            '<p><i class="fas fa-map-marker-alt"></i> ' + shelter.address + '</p>' +
+            '<p><i class="fas fa-mail-bulk"></i> Zip: ' + shelter.pincode + '</p>' +
+            '<p><i class="fas fa-exclamation-triangle"></i> <strong>Active Needs: ' + shelter.needs_count + '</strong></p>' +
+            '<a href="/area/' + shelter.id + '/" class="btn btn-sm btn-primary mt-1">View Details</a>';
+        
+        marker.bindPopup(popupContent);
+    }
+    
+    // If no shelters have coordinates, show a message
+    if (shelters.length === 0) {
+        var popup = L.popup()
+            .setLatLng([26.45, -81.8])
+            .setContent('<p>No shelter locations with coordinates yet.</p>')
+            .openOn(map);
+    }
+</script>
+{% endblock %}
