@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+
+{% block title %}FAQ - Frequently Asked Questions | Hurricane Heroes{% endblock %}
+
+{% block meta_description %}
+Frequently asked questions about Hurricane Heroes: how to donate, volunteer, find shelters, and help hurricane victims in Southwest Florida.
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .faq-item {
+        border-left: 4px solid #0b34eb;
+        margin-bottom: 1rem;
+    }
+    .faq-item .card-body {
+        padding: 1.5rem;
+    }
+    .faq-question {
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+    }
+    .faq-answer {
+        color: #475569;
+        line-height: 1.7;
+    }
+</style>
+
+<!-- FAQ Schema for Google -->
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+        {
+            "@type": "Question",
+            "name": "What is Hurricane Heroes?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Hurricane Heroes is a community platform created by an Estero High School student to help Southwest Florida communities during hurricanes. It connects shelters with donors and volunteers by showing real-time information about what each shelter needs."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "How can I donate supplies to hurricane shelters?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Visit our homepage to see what each shelter currently needs. You can view needs by region, category, or priority. Once you've donated items, log your donation on our Donate page so we can track community contributions."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "How do I volunteer for hurricane relief in Southwest Florida?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Click the Volunteer link in our navigation to sign up. You'll provide your name, contact info, preferred shelter, availability, and any relevant skills. Our team will contact you when help is needed."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "What shelters are covered by Hurricane Heroes?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Hurricane Heroes currently covers 20+ shelters across Lee County, Southwest Florida, including locations in Fort Myers, Cape Coral, Estero, Lehigh Acres, and North Fort Myers. View all shelters on our interactive map."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "How can I request help if I'm affected by a hurricane?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Visit our Request Help page to submit a need request. Provide the item you need, quantity, urgency level, and your nearest shelter. Our team reviews all requests and works to fulfill them."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "How do hurricane shelters update their needs?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Each shelter has a designated Shelter Admin who logs in to update their current needs in real time. This ensures donors always see the most accurate and up-to-date information."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "Is Hurricane Heroes a nonprofit?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Hurricane Heroes is a free community service platform created by a local high school student. There are no fees to use the platform. It is designed purely to help the Southwest Florida community during hurricane season."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "What areas does Hurricane Heroes serve?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Hurricane Heroes serves Southwest Florida, primarily Lee County including Fort Myers, Cape Coral, Estero, Bonita Springs, Lehigh Acres, and North Fort Myers."
+            }
+        }
+    ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+    <div class="container text-center">
+        <h1 class="fs-4 fw-bold mb-0">
+            <i class="fas fa-question-circle me-2"></i>Frequently Asked Questions
+        </h1>
+    </div>
+</div>
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            
+            <div class="card faq-item">
+                <div class="card-body">
+                    <h3 class="faq-question">What is Hurricane Heroes?</h3>
+                    <p class="faq-answer">Hurricane Heroes is a community platform created by an Estero High School student to help Southwest Florida communities during hurricanes. It connects shelters with donors and volunteers by showing real-time information about what each shelter needs.</p>
+                </div>
+            </div>
+
+            <div class="card faq-item">
+                <div class="card-body">
+                    <h3 class="faq-question">How can I donate supplies to hurricane shelters?</h3>
+                    <p class="faq-answer">Visit our <a href="{% url 'public_home' %}">homepage</a> to see what each shelter currently needs. You can view needs by region, category, or priority. Once you've donated items, log your donation on our <a href="{% url 'donate' %}">Donate page</a> so we can track community contributions.</p>
+                </div>
+            </div>
+
+            <div class="card faq-item">
+                <div class="card-body">
+                    <h3 class="faq-question">How do I volunteer for hurricane relief in Southwest Florida?</h3>
+                    <p class="faq-answer">Click the <a href="{% url 'volunteer_signup' %}">Volunteer</a> link in our navigation to sign up. You'll provide your name, contact info, preferred shelter, availability, and any relevant skills. Our team will contact you when help is needed.</p>
+                </div>
+            </div>
+
+            <div class="card faq-item">
+                <div class="card-body">
+                    <h3 class="faq-question">What shelters are covered by Hurricane Heroes?</h3>
+                    <p class="faq-answer">Hurricane Heroes currently covers 20+ shelters across Lee County, Southwest Florida, including locations in Fort Myers, Cape Coral, Estero, Lehigh Acres, and North Fort Myers. View all shelters on our <a href="{% url 'shelter_map' %}">interactive map</a>.</p>
+                </div>
+            </div>
+
+            <div class="card faq-item">
+                <div class="card-body">
+                    <h3 class="faq-question">How can I request help if I'm affected by a hurricane?</h3>
+                    <p class="faq-answer">Visit our <a href="{% url 'public_need_request' %}">Request Help</a> page to submit a need request. Provide the item you need, quantity, urgency level, and your nearest shelter. Our team reviews all requests and works to fulfill them.</p>
+                </div>
+            </div>
+
+            <div class="card faq-item">
+                <div class="card-body">
+                    <h3 class="faq-question">How do hurricane shelters update their needs?</h3>
+                    <p class="faq-answer">Each shelter has a designated Shelter Admin who logs in to update their current needs in real time. This ensures donors always see the most accurate and up-to-date information.</p>
+                </div>
+            </div>
+
+            <div class="card faq-item">
+                <div class="card-body">
+                    <h3 class="faq-question">Is Hurricane Heroes a nonprofit?</h3>
+                    <p class="faq-answer">Hurricane Heroes is a free community service platform created by a local high school student. There are no fees to use the platform. It is designed purely to help the Southwest Florida community during hurricane season.</p>
+                </div>
+            </div>
+
+            <div class="card faq-item">
+                <div class="card-body">
+                    <h3 class="faq-question">What areas does Hurricane Heroes serve?</h3>
+                    <p class="faq-answer">Hurricane Heroes serves Southwest Florida, primarily Lee County including Fort Myers, Cape Coral, Estero, Bonita Springs, Lehigh Acres, and North Fort Myers.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

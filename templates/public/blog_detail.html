@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ article.title }} | Hurricane Heroes Blog{% endblock %}
+
+{% block meta_description %}{{ article.summary|default:article.content|truncatewords:30 }}{% endblock %}
+
+{% block extra_css %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "{{ article.title }}",
+    "datePublished": "{{ article.created_at|date:'Y-m-d' }}",
+    "author": {
+        "@type": "Organization",
+        "name": "Hurricane Heroes"
+    },
+    "publisher": {
+        "@type": "Organization",
+        "name": "Hurricane Heroes"
+    }
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <a href="{% url 'blog_list' %}" class="btn btn-outline-primary mb-4">
+                <i class="fas fa-arrow-left me-2"></i>Back to Blog
+            </a>
+            
+            <article>
+                <h1 class="fw-bold mb-3">{{ article.title }}</h1>
+                <small class="text-muted">
+                    <i class="fas fa-calendar me-1"></i>{{ article.created_at|date:"F d, Y" }}
+                </small>
+                <hr>
+                <div class="article-content" style="line-height: 1.8; font-size: 1.05rem;">
+                    {{ article.content|linebreaks }}
+                </div>
+            </article>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -146,3 +146,14 @@ class DonationAdmin(admin.ModelAdmin):
     list_display = ('donor_name', 'item_name', 'quantity', 'area', 'created_at')
     search_fields = ('donor_name', 'email', 'item_name')
     list_filter = ('area', 'created_at')
+
+
+# Article Admin
+from .models import Article
+
+@admin.register(Article)
+class ArticleAdmin(admin.ModelAdmin):
+    list_display = ('title', 'is_published', 'created_at')
+    prepopulated_fields = {'slug': ('title',)}
+    search_fields = ('title', 'content')
+    list_filter = ('is_published', 'created_at')

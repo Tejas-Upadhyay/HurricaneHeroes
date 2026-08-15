@@ -8,6 +8,32 @@
     <title>{% block title %}Southwest Florida Hurricane Relief - Find & Donate Needed Items to Local Shelters{% endblock %}</title>
     <meta name="description" content="{% block meta_description %}Help hurricane shelters in Southwest Florida by finding out exactly what items are needed. Donate supplies, support your community, and make a difference during hurricane season. Real-time updates for all local shelters.{% endblock %}">
 
+    <!-- Open Graph / Social Sharing -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Hurricane Heroes - SWFL Hurricane Relief">
+    <meta property="og:description" content="Community platform connecting donors and volunteers with hurricane shelters in Southwest Florida. Find what's needed, donate supplies, volunteer.">
+    <meta property="og:url" content="https://southwestfloridahurricaneheroes.com/">
+    <meta property="og:site_name" content="Hurricane Heroes">
+
+    <!-- Organization Schema for SEO -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Hurricane Heroes",
+        "url": "https://southwestfloridahurricaneheroes.com",
+        "description": "Community platform created by an Estero High School student to connect donors and volunteers with hurricane shelters in Southwest Florida.",
+        "areaServed": {
+            "@type": "Place",
+            "name": "Southwest Florida, Lee County"
+        },
+        "founder": {
+            "@type": "Person",
+            "name": "Estero High School Student"
+        }
+    }
+    </script>
+
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="{% static 'images/logo.png' %}">
     
@@ -216,6 +242,16 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'public_contact' %}">
                             <i class="fas fa-envelope me-2"></i>Contact Us
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'faq' %}">
+                            <i class="fas fa-question-circle me-2"></i>FAQ
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'blog_list' %}">
+                            <i class="fas fa-newspaper me-2"></i>Blog
                         </a>
                     </li>
                     <li class="nav-item">

@@ -1,142 +1,78 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset
-      xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
-            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
-<!-- created with Free Online Sitemap Generator www.xml-sitemaps.com -->
-
-
-<url>
-  <loc>https://southwestfloridahurricaneheroes.com/</loc>
-  <lastmod>2026-01-06T20:19:03+00:00</lastmod>
-  <priority>1.00</priority>
-</url>
-<url>
-  <loc>https://southwestfloridahurricaneheroes.com/about/</loc>
-  <lastmod>2026-01-06T20:19:03+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://southwestfloridahurricaneheroes.com/services/</loc>
-  <lastmod>2026-01-06T20:19:03+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://southwestfloridahurricaneheroes.com/contact/</loc>
-  <lastmod>2026-01-06T20:19:03+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://southwestfloridahurricaneheroes.com/areas/</loc>
-  <lastmod>2026-01-06T20:19:03+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://southwestfloridahurricaneheroes.com/login/</loc>
-  <lastmod>2026-01-06T20:19:03+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://southwestfloridahurricaneheroes.com/area/17/</loc>
-  <lastmod>2026-01-06T20:19:03+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://southwestfloridahurricaneheroes.com/area/7/</loc>
-  <lastmod>2026-01-06T20:19:03+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://southwestfloridahurricaneheroes.com/area/3/</loc>
-  <lastmod>2026-01-06T20:19:03+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://southwestfloridahurricaneheroes.com/area/5/</loc>
-  <lastmod>2026-01-06T20:19:03+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://southwestfloridahurricaneheroes.com/area/13/</loc>
-  <lastmod>2026-01-06T20:19:03+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://southwestfloridahurricaneheroes.com/area/6/</loc>
-  <lastmod>2026-01-06T20:19:03+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://southwestfloridahurricaneheroes.com/area/1/</loc>
-  <lastmod>2026-01-06T20:19:03+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://southwestfloridahurricaneheroes.com/area/4/</loc>
-  <lastmod>2026-01-06T20:19:03+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://southwestfloridahurricaneheroes.com/area/8/</loc>
-  <lastmod>2026-01-06T20:19:03+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://southwestfloridahurricaneheroes.com/area/14/</loc>
-  <lastmod>2026-01-06T20:19:03+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://southwestfloridahurricaneheroes.com/area/2/</loc>
-  <lastmod>2026-01-06T20:19:03+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://southwestfloridahurricaneheroes.com/area/15/</loc>
-  <lastmod>2026-01-06T20:19:03+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://southwestfloridahurricaneheroes.com/area/16/</loc>
-  <lastmod>2026-01-06T20:19:03+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://southwestfloridahurricaneheroes.com/area/18/</loc>
-  <lastmod>2026-01-06T20:19:03+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://southwestfloridahurricaneheroes.com/area/9/</loc>
-  <lastmod>2026-01-06T20:19:03+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://southwestfloridahurricaneheroes.com/area/19/</loc>
-  <lastmod>2026-01-06T20:19:03+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://southwestfloridahurricaneheroes.com/area/10/</loc>
-  <lastmod>2026-01-06T20:19:03+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://southwestfloridahurricaneheroes.com/area/11/</loc>
-  <lastmod>2026-01-06T20:19:03+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://southwestfloridahurricaneheroes.com/area/12/</loc>
-  <lastmod>2026-01-06T20:19:03+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://southwestfloridahurricaneheroes.com/area/20/</loc>
-  <lastmod>2026-01-06T20:19:03+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-
-
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+        <loc>https://southwestfloridahurricaneheroes.com/</loc>
+        <changefreq>daily</changefreq>
+        <priority>1.0</priority>
+    </url>
+    <url>
+        <loc>https://southwestfloridahurricaneheroes.com/about/</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>https://southwestfloridahurricaneheroes.com/services/</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    <url>
+        <loc>https://southwestfloridahurricaneheroes.com/contact/</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    <url>
+        <loc>https://southwestfloridahurricaneheroes.com/areas/</loc>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
+    <url>
+        <loc>https://southwestfloridahurricaneheroes.com/map/</loc>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
+    <url>
+        <loc>https://southwestfloridahurricaneheroes.com/volunteer/</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>https://southwestfloridahurricaneheroes.com/request-help/</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>https://southwestfloridahurricaneheroes.com/donate/</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>https://southwestfloridahurricaneheroes.com/faq/</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>https://southwestfloridahurricaneheroes.com/blog/</loc>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>https://southwestfloridahurricaneheroes.com/blog/how-to-prepare-for-hurricane-southwest-florida/</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    <url>
+        <loc>https://southwestfloridahurricaneheroes.com/blog/what-supplies-hurricane-shelters-need-most/</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    <url>
+        <loc>https://southwestfloridahurricaneheroes.com/blog/how-hurricane-heroes-helps-southwest-florida/</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    <url>
+        <loc>https://southwestfloridahurricaneheroes.com/search/</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.5</priority>
+    </url>
 </urlset>

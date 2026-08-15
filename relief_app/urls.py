@@ -17,6 +17,9 @@ urlpatterns = [
     path('request-help/', views.public_need_request, name='public_need_request'),
     path('donate/', views.donate, name='donate'),
     path('search/', views.global_search, name='global_search'),
+    path('faq/', views.faq, name='faq'),
+    path('blog/', views.blog_list, name='blog_list'),
+    path('blog/<slug:slug>/', views.blog_detail, name='blog_detail'),
     
     # Authentication
     path('login/', views.login_view, name='login'),

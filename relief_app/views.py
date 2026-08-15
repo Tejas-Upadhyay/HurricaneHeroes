@@ -1622,3 +1622,25 @@ def global_search(request):
         'total_results': total_results,
     }
     return render(request, 'public/search.html', context)
+
+
+
+def faq(request):
+    """FAQ page"""
+    return render(request, 'public/faq.html')
+
+
+def blog_list(request):
+    """List all blog articles"""
+    from .models import Article
+    articles = Article.objects.filter(is_published=True).order_by('-created_at')
+    context = {'articles': articles}
+    return render(request, 'public/blog.html', context)
+
+
+def blog_detail(request, slug):
+    """View a single blog article"""
+    from .models import Article
+    article = get_object_or_404(Article, slug=slug, is_published=True)
+    context = {'article': article}
+    return render(request, 'public/blog_detail.html', context)

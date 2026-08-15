@@ -235,3 +235,23 @@ class Donation(models.Model):
     
     def __str__(self):
         return f"{self.donor_name} - {self.item_name} ({self.quantity})"
+
+
+
+# Blog Article Model
+class Article(models.Model):
+    title = models.CharField(max_length=300)
+    slug = models.SlugField(max_length=300, unique=True)
+    content = models.TextField()
+    summary = models.TextField(max_length=500, blank=True)
+    is_published = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = 'Article'
+        verbose_name_plural = 'Articles'
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return self.title
