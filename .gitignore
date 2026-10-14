@@ -42,4 +42,7 @@ db.sqlite3-journal
 .DS_Store
 Thumbs.db
 
+# Internal / not for public repo
+docs/EMAIL_TEMPLATES.md
+
 
