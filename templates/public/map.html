@@ -73,9 +73,12 @@
     
     var map = L.map('map').setView([26.45, -81.8], 10);
     
-    // Add OpenStreetMap tiles (free, no API key needed)
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors'
+    // Map tiles via CARTO basemaps (free CDN, allows app use; OSM data).
+    // Avoids OpenStreetMap's volunteer tile servers, which return 403 for apps.
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        subdomains: 'abcd',
+        maxZoom: 20
     }).addTo(map);
     
     // Shelter data from Django
