@@ -329,10 +329,9 @@ See what’s needed now at {{ area.name }}: description, address, and a real-tim
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
     var map = L.map('mini-map').setView([{{ area.latitude }}, {{ area.longitude }}], 15);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-        subdomains: 'abcd',
-        maxZoom: 20
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, USGS, &copy; OpenStreetMap contributors',
+        maxZoom: 19
     }).addTo(map);
     L.marker([{{ area.latitude }}, {{ area.longitude }}]).addTo(map)
         .bindPopup('<strong>{{ area.name }}</strong><br>{{ area.address }}')

@@ -73,12 +73,10 @@
     
     var map = L.map('map').setView([26.45, -81.8], 10);
     
-    // Map tiles via CARTO basemaps (free CDN, allows app use; OSM data).
-    // Avoids OpenStreetMap's volunteer tile servers, which return 403 for apps.
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-        subdomains: 'abcd',
-        maxZoom: 20
+    // Map tiles via Esri World Street Map (free, no API key required, allows app use).
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, USGS, &copy; OpenStreetMap contributors',
+        maxZoom: 19
     }).addTo(map);
     
     // Shelter data from Django
